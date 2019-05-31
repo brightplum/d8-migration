@@ -68,9 +68,7 @@
         }
 
         // Already donated button.
-        console.log(block_id);
         $(block_id).find("#bio_ep_close").click(function(e) {
-          console.log("here");
           localStorage.setItem('commondreams.modal_popup-' + campaign + '.already_donated', 1);
           //bioEp.hidePopup();
           // Hide all other ctas.
@@ -79,7 +77,6 @@
 
         // Extra close modal functionality.
         $("#close-modal").click(function(e) {
-          console.log("here");
           localStorage.setItem('commondreams.modal_popup-' + campaign + '.already_donated', 1);
           bioEp.hidePopup();
           e.preventDefault();
