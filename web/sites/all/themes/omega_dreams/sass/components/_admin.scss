@@ -1,0 +1,31 @@
+﻿
+
+#views-article-node-form {
+  background-color: #f0f0f0;
+}
+
+#newswire-node-form {
+  //background-color: #F7CCC6;
+}
+
+#headline-node-form {
+  //background-color: #ACD8BA;
+}
+
+#further-node-form {
+  //background-color: #F5DDE8;
+}
+
+.l-main {
+  form {
+    input[type=text] {
+      border: solid 1px #cccccc;
+    }
+  }
+}
+
+form#media-format-form {
+    input[type=text] {
+      border: solid 1px #cccccc;
+    }
+}

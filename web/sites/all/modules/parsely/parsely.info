@@ -1,0 +1,13 @@
+name = Parse.ly
+package = Statistics
+description = Adds Parse.ly to your Drupal site
+core = 7.x
+version = 1.x-dev
+configure = admin/config/system/parsely
+
+; Information added by Drupal.org packaging script on 2015-08-22
+version = "7.x-1.51"
+core = "7.x"
+project = "parsely"
+datestamp = "1440278640"
+

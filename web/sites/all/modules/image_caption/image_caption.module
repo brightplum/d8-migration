@@ -1,0 +1,95 @@
+<?php
+/**
+* @file
+* Image Captioner Module using JQuery
+* Requires javascript as enabled on client pc
+* Adds a caption to images with 'caption' as their class using JQuery
+* Caption is taken from image html title attribute
+* @author David Thomas
+* @contact davidwhthomas@gmail.com
+*/
+
+/**
+ * Implementation of hook_init
+ * Add captioning javascript
+ */
+function image_caption_init(){
+  $selector = variable_get('image_caption_selector', array(
+    'img.caption',
+    '.field--type-image.caption img',
+  ));
+
+  $selector = implode(', ', $selector);
+  
+  drupal_add_js(array('image_caption' => array('selector' => $selector)), 'setting');
+  drupal_add_js(drupal_get_path('module', 'image_caption') . '/image_caption.js');
+}
+
+/**
+ * Implementation of hook_menu
+ * Add administration page for setting caption selectors
+ */
+function image_caption_menu() {
+  return array(
+    'admin/config/media/image-caption' => array(
+      'title' => 'Image Caption Settings',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('image_caption_settings_form'),
+      'access arguments' => array('administer site configuration'),
+      'description' => 'Configure image caption settings',
+    ),
+  );
+}
+
+/**
+ * 
+ * @param type $form
+ * @param type $form_state
+ */
+function image_caption_settings_form($form, &$form_state) {
+  $selector = variable_get('image_caption_selector', array(
+    'img.caption',
+    '.field--type-image.caption img',
+  ));
+  
+  $selector = implode(', ', $selector);
+  
+  $form['image_caption_selector'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Image caption filter'),
+    '#default_value' => $selector,
+  );
+  
+  $form['actions'] = array(
+    '#type' => 'actions',
+    
+    'save' => array(
+      '#type' => 'submit',
+      '#value' => t('Save'),
+    ),
+  );
+  
+  return $form;
+}
+
+
+function image_caption_settings_form_validate($form, &$form_state) {
+  $selector = $form_state['values']['image_caption_selector'];
+  
+  if (preg_match('#[^a-z,0-9,\-_.\#\,\[\]=] #i', $selector, $matches)) {
+    form_set_error(
+      'image_caption_selector',
+      t('Invalid characters found in the selector field. '. implode('|', $matches))
+    );
+  }
+}
+
+function image_caption_settings_form_submit($form, &$form_state) {
+  $selectors = explode(',', $form_state['values']['image_caption_selector']);
+  $selectors = array_map('trim', $selectors);
+  
+  variable_set('image_caption_selector', $selectors);
+  
+  drupal_set_message(t('Successfully saved changes.'));
+}
+  

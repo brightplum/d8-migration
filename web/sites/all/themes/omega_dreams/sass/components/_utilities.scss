@@ -1,0 +1,15 @@
+.hide-for-tablet {
+  display: none;
+  @include breakpoint(900px) {
+    display: block;
+  }
+}
+.hide-for-desktop {
+  display: block;
+  @include breakpoint(900px) {
+    display: none;
+  }
+}
+.hidden {
+  display: none;
+}

@@ -1,0 +1,76 @@
+<html>
+
+<head>
+  <title></title>
+  <style type="text/css">
+    body, table, tr, td, div, textarea, input
+    {
+      color: 			black;
+      font-family: 	Trebuchet MS, Arial, Helvetica, sans-serif;
+      font-size: 		11px;
+    }
+    .row {
+      clear:both;
+      overflow:hidden;
+    }
+    .column {
+      width: 50%;
+      float: left;
+    }
+    .inline {
+      display: inline;
+    }
+    .inline-image {
+      display: inline;
+    }
+    .inline-image-align-right {
+      float: right;
+      margin: 0 5px 5px 0;
+    }
+    .inline-image-align-left {
+      float: left;
+      margin: 0 0 5px 5px;
+    }
+    @media screen and (max-width:420px) {
+      .inline-image {
+        display: block;
+      }
+      .inline-image img {
+        width: 100%;
+        height: auto;
+      }
+      .inline-image-align-right,
+      .inline-image-align-left {
+        float: none;
+        margin: 0 0 10px 0;
+      }
+    }
+  </style>
+</head>
+
+<body bgcolor="#FFFFFF">
+<table border="0" width="100%" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="100%" valign="top" style="padding-bottom: 5px">
+      {{HEADER}}
+    </td>
+  </tr>
+  <tr>
+    <td width="100%" valign="top">
+      {{LOGO}}
+    </td>
+  </tr>
+  <tr>
+    <td width="100%" valign="top">
+      {{TEXT}}
+    </td>
+  </tr>
+  <tr>
+    <td width="100%" valign="top" style="padding-top: 5px">
+      {{FOOTER}}
+    </td>
+  </tr>
+</table>
+</body>
+
+</html>

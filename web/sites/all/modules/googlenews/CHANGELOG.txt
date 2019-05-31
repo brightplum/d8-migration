@@ -1,0 +1,55 @@
+GoogleNews 7.x-1.7, 2018-09-16
+------------------------------
+#2028063 by DamienMcKenna: Don't output empty tags.
+#2028047 by DamienMcKenna: Clear the sitemap cache after saving the settings.
+#2027937 by DamienMcKenna: Moved the menu item.
+#2028201 by DamienMcKenna: Made the output readable.
+#2028207 by DamienMcKenna: Moved the optional tags to the correct location.
+#2028047 by DamienMcKenna: Clear the sitemap page cache after saving the
+  settings.
+#2057783 by FeyP: Incorrect default value for certain googlenews tag types.
+#2354449 by qwertyisms, DamienMcKenna: Allow the base URL to be customized.
+#2049783 by DamienMcKenna, Grayside: Allow the default tags, the node value &
+  tags and final output to be customized via drupal_alter().
+#2049825 by DamienMcKenna, mfb: Don't double-encode token-replaced values.
+#2183583 by DamienMcKenna, pokap: Allow the urlset attributes to be altered.
+#2384585 by DamienMcKenna, vinmassaro: SQL Syntax Error if no content types
+  selected.
+#2572911 by DamienMcKenna, jacmkno: Include $base_url in the cache cid to follow
+  normal Drupal cache conventions.
+#2999866 by DamienMcKenna: Add option to allow a view to control the list.
+#3000082 by DamienMcKenna: Add test coverage for admin functionality.
+#2828120 by DamienMcKenna: hook_googlenews_item not working.
+#2833623 by prince_kr, DamienMcKenna: Fix Drupal coding standards.
+
+
+GoogleNews 7.x-1.6, 2013-06-21
+------------------------------
+#2020029 by DamienMcKenna: Incorrect variable name for the content timer.
+#1985728 by DamienMcKenna: Incorrect XML namespace.
+#2020241 by DamienMcKenna: Incorrect variable name for the caching.
+#867690 by DamienMcKenna: Load the node before checking its language, use the
+  default if the node doesn't have a language value.
+#2020273 by DamienMcKenna: Updated the README.txt file.
+#1035294 by DamienMcKenna: Updated the README.txt file to provide more info on
+  settings available and added a note about the most common problem of no
+  content.
+
+
+GoogleNews 7.x-1.5, 2013-06-14
+------------------------------
+#1265766 by DamienMcKenna, rwohleb: Move the pages into separate files.
+#645786 by DamienMcKenna, annikaC, iamer, danmccarey, yan, alexromao: Added an
+  option to customize the publication name.
+#1110598 by DamienMcKenna, jaytennier, protyze: Escape the publication name.
+#832440 by DamienMcKenna, liquidcms, GreenReaper: Added the access, genres,
+  geo_locations, keywords and stock_tickers tags.
+#1985728 by DamienMcKenna: Changed output to use the 'news:' prefix.
+#2020241 by DamienMcKenna: Cache the sitemap output.
+#867690 by DamienMcKenna: Use the node's language, not the site-wide language.
+#1181648 by DamienMcKenna, fgm, littlecow: Add a tag to the query so it can be
+  altered using hook_query_TAG_alter().
+#2020029 by DamienMcKenna: Add an option to control the maximum age of content
+  to include.
+#2020031 by DamienMcKenna: Display the number of suitable nodes on the admin
+  form.
