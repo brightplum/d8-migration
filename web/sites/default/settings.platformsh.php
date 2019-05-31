@@ -31,16 +31,6 @@ if (getenv('PLATFORM_RELATIONSHIPS')) {
   }
 }
 
-// Configure private and temporary file paths.
-if (getenv('PLATFORM_APP_DIR')) {
-  if (!isset($conf['file_private_path'])) {
-    $conf['file_private_path'] = getenv('PLATFORM_APP_DIR') . '/private';
-  }
-  if (!isset($conf['file_temporary_path'])) {
-    $conf['file_temporary_path'] = getenv('PLATFORM_APP_DIR') . '/tmp';
-  }
-}
-
 // Import variables prefixed with 'drupal:' into $conf.
 if (getenv('PLATFORM_VARIABLES')) {
   $variables = json_decode(base64_decode(getenv('PLATFORM_VARIABLES')), TRUE);
