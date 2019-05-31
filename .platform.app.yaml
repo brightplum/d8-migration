@@ -23,10 +23,10 @@ dependencies:
         "drush/drush": "^8.0"
 
 mounts:
-    '/web/sites/default/files': 'shared:files/files'
-    '/tmp': 'shared:files/tmp'
-    '/files-private': 'shared:files/private'
-    '/drush-backups': 'shared:files/drush-backups'
+  '/web/sites/default/files': 'shared:files/files'
+  '/tmp': 'shared:files/tmp'
+  '/files-private': 'shared:files/private'
+  '/drush-backups': 'shared:files/drush-backups'
 
 build:
     flavor: drupal
