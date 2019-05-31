@@ -2,9 +2,9 @@ mysqldb:
   type: "mysql:10.2"
   disk: 3048
 
-#rediscache:
-#  type: "redis:3.0"
-#
-#solrsearch:
-#  type: "solr:4.10"
-#  disk: 1024
+rediscache:
+  type: "redis:3.0"
+
+solrsearch:
+  type: "solr:4.10"
+  disk: 1024

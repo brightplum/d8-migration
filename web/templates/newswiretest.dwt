@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<!-- TemplateBeginEditable name="doctitle" -->
+<title>Untitled Document</title>
+<!-- TemplateEndEditable -->
+<!-- TemplateBeginEditable name="head" -->
+<!-- TemplateEndEditable -->
+</head>
+
+<body>
+<center>
+<table border="0" width="600" cellspacing="0" cellpadding="0" align="center" bgcolor="#FFFFFF">
+<tr valign="middle" align="center">
+<td height="85" width="35%"><p align="center"><p align="center"><font color="#000080" face="Arial, Helvetica, sans-serif" size="3"> 
+<script>
+var mydate=new Date()
+var theYear=mydate.getFullYear()
+var day=mydate.getDay()
+var month=mydate.getMonth()
+var daym=mydate.getDate()
+if (daym<10)
+daym="0"+daym
+var dayarray=new Array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
+var montharray=new Array("January","February","March","April","May","June","July","August","September","October","November","December")
+document.write(dayarray[day]+"<br> "+montharray[month]+" "+daym+", "+theYear)
+</script><br>
+</font></td>
+<td height="85" width="65%"><div align="left"><a href="http://www.commondreams.org"><img border="0" src="../images/newswire.gif" width="340" height="75" alt="Common Dreams NewsCenter" align="bottom"></a></div></td>
+</tr>
+<tr valign="middle" align="left">
+<td bgcolor="#F4F4E1" height="25" width="35%"><p></td>
+<td align="center" bgcolor="#F4F4E1" height="25" width="65%"><div align="left"><font face="Arial, Helvetica, sans-serif" size="1" color="#000000"> </font><font color="#F4F4E1"><b><font face="Arial, Helvetica, sans-serif" size="1">&nbsp;</font><font face="Arial, Helvetica, sans-serif" size="1"><a href="http://www.commondreams.org/">Home</a> | <a href="http://www.commondreams.org/newswire.htm">Newswire</a> | <a href="http://www.commondreams.org/contactingus.htm">Contacting Us</a> | <a href="http://www.commondreams.org/about.htm">About Us</a> | <a href="http://www.commondreams.org/donate.htm">Donate</a> | <a href="http://www.commondreams.org/email.htm">Sign-Up</a> | <a href="http://www.commondreams.org/archives.htm">Archives</a></font></b></font><font face="Verdana, Arial, Helvetica, sans-serif" size="1" color="#000099">&nbsp;</font></div></td>
+</tr>
+<tr valign="middle" align="left" bgcolor="#E8E8E8">
+<td height="25" colspan="2"><div align="right"><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><b>&nbsp;&nbsp;<a href="http://www.commondreams.org/">NewsCenter</a> &gt; <a href="http://www.commondreams.org/community.htm">Progressive Community</a> &gt; <a href="http://www.commondreams.org/newswire.htm">NewsWire</a> </b></font><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">&gt; <!-- #BeginEditable "Add%20Month%20Again" -->{Add Month Again}<!-- #EndEditable -->&nbsp;&nbsp;</font></b></div></td>
+</tr>
+<tr valign="middle" align="left">
+<td colspan="2">&nbsp;</td>
+</tr>
+</table>
+</center>
+<hr width="600" noshade color="#384880" size="1" align="center">
+
+<center>
+<table border="0" cellpadding="6" cellspacing="0" width="600" bordercolor="#F4F4E1">
+<tr valign="middle"> 
+<td align="right" colspan="3" bordercolorlight="#FFFFFF" bordercolordark="#FFFFFF" width="600">&nbsp;</td>
+</tr>
+<tr> 
+<td align="right" valign="top" width="125"><p align="left"><font size="2" face="Arial, Helvetica, sans-serif"><img src="images/arrow.gif" width="10" height="12" alt="Arrow"><a href="http://www.commondreams.org/community.htm">America's Progressive Community</a></font></p>
+<p align="left"><font face="Arial, Helvetica, sans-serif" size="2"><b> Making News?</b><br>
+<font size="1">Read our <a href="../newspolicy.htm">Guidelines for Submitting News Releases</a></font><br>
+</font></p>
+<p align="left"><font size="1" face="Arial"><br>
+<br>
+</font><small><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><b>Common Dreams <a href="http://www.commondreams.org/">NewsCenter</a>&nbsp;is a non-profit news service 
+providing breaking news and views for the Progressive Community.</b></font></small>
+<p align="left"><font face="Verdana, Arial, Helvetica, sans-serif" size="1"><small>The press releases posted here have been provided to Common Dreams NewsWire by the many progressive organizations who make up <a href="http://www.commondreams.org/community.htm">America's Progressive Community</a>. If you wish to comment on this press release or would like more information, please contact the organization directly.<br>
+</small></font><font size="1" face="Arial">*all times Eastern US (GMT-5:00)</font><font face="Arial, Helvetica, sans-serif" size="2"><small> <br>
+</small></font></p>
+<p align="left"><font face="MS Sans Serif" size="1"><b><a href="http://www.commondreams.org/archives.htm">Our Archives</a></b></font> 
+</p></td>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+<td valign="top" width="450" align="left" style="font-family: Arial; font-size: 10pt; border-style: none; border-width: medium">
+<b><font face="Arial, Helvetica, sans-serif" size="4" color="#999999">&nbsp;&nbsp;
+<!-- #BeginEditable "Add%20Month" -->{Add Month}<!-- #EndEditable --></font></b>
+<font face="Arial, Helvetica, sans-serif" size="2">
+<!-- #BeginEditable "releases" -->
+<p>{releases}</p>
+<!-- #EndEditable --></font>
+</td>
+<td valign="top" width="25" align="left" style="border-style: none; border-width: medium" bgcolor="#FFFFFF">&nbsp;</td>
+</tr>
+</table>
+<br>
+<div align="center"><div align="center">
+<div align="center">
+<div align="center">
+<div align="center"><font face="Arial, Helvetica, sans-serif" size="2"><b>Common Dreams <a href="http://www.commondreams.org/">NewsCenter</a></b> <br>
+A non-profit news service providing breaking news &amp; views for the progressive community. <br>
+<b><font face="Arial, Helvetica, sans-serif" size="1"><a href="http://www.commondreams.org/">Home</a> | <a href="http://www.commondreams.org/newswire.htm">Newswire</a> | <a href="http://www.commondreams.org/contactingus.htm">Contacting Us</a> | <a href="http://www.commondreams.org/about.htm">About Us</a> | <a href="http://www.commondreams.org/donate.htm">Donate</a> | <a href="http://www.commondreams.org/email.htm">Sign-Up</a> | <a href="http://www.commondreams.org/archives.htm">Archives</a></font></b></font> <font face="Arial, Helvetica, sans-serif" size="2"><br>
+<br>
+</font> </div>
+</div>
+<p align="center"> <font face="Arial, Helvetica, sans-serif" size="1">&copy; Copyrighted 1997-2005<br>
+<a href="http://www.commondreams.org/">www.commondreams.org</a></font></p>
+</div>
+</div>
+</div>
+</center>
+</body>
+</html>
