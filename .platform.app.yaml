@@ -1,9 +1,9 @@
 name: 'app'
 type: 'php:7.1'
 
-runtime:
-  extensions:
-  - redis
+#runtime:
+#  extensions:
+#  - redis
 
 variables:
   php:
@@ -13,8 +13,8 @@ variables:
 
 relationships:
   database: 'mysqldb:mysql'
-  solr: 'solrsearch:solr'
-  redis: 'rediscache:redis'
+#  solr: 'solrsearch:solr'
+#  redis: 'rediscache:redis'
 
 disk: 10000
 
