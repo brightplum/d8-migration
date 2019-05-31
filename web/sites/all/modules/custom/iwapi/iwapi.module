@@ -1,0 +1,744 @@
+<?php
+/**
+ * @file iwapi.module
+ * This module is designed only to provide functionality to other modules.
+ */
+
+// Genericly defined constants commonly used for entity status.
+define('IWAPI_ACTIVE', 1);
+define('IWAPI_INACTIVE', 0);
+
+define('ENTITY_ACCESS_ALLOW',  'allow');
+define('ENTITY_ACCESS_DENY',   'deny');
+define('ENTITY_ACCESS_IGNORE', NULL);
+
+
+// Define variables for later use
+define('IWAPI_VAR_MUTEX_TYPE',        'iwapi_mutex_type');
+define('IWAPI_VAR_MEMCACHE_LOCATION', 'iwapi_memcache_connection');
+define('IWAPI_VAR_COLLAPSE_MOD_LIST', 'iwapi_collapse_module_list');
+
+
+// =============================
+// Drupal Core HOOKS
+// =============================
+
+/**
+ * Implements HOOK_cron_queue_info().
+ */
+function iwapi_cron_queue_info() {
+  return array(
+    'iwapi_entity_clear' => array(
+      'worker callback' => 'iwapi_entity_clear',
+      'time' => 60,
+    ),
+  );
+}
+
+/**
+ * Implements HOOK_permission()
+ */
+function iwapi_permission() {
+  // Importing requires "administer site configuration" and package specific permissions.
+  return array(
+    'get iwapi package exports' => array(
+      'title' => t('User can create or download IWAPI packages.'),
+      'restrict access' => TRUE,
+    ),
+    'manage iwapi packages system' => array(
+      'title' => t('User has the ability to create, delete and remove iwapi system packages.'),
+      'restrict access' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Implements HOOK_menu()
+ */
+function iwapi_menu() {
+  // ---------------------------
+  // System admin forms.
+  $menu['admin/config/system/iwapi-utils'] = array(
+    'title' => 'Image Works Utilities',
+    'description' => 'Configure various utilities provided by the iwapi module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('iwapi_admin_setting_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'iwapi.admin.inc',
+  );
+  $menu['admin/config/system/iwapi-utils/settings'] = array(
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'title' => 'Settings',
+    'weight' => 10,
+  );
+
+  // Manage entities
+  $menu['admin/config/system/iwapi-utils/entities'] = array(
+    'type' => MENU_LOCAL_TASK,
+    'title' => 'Entity Management',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('iwapi_entity_modify_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'admin/entity.inc',
+    'description' => 'Use iwapi to import / export entity settings and fields.',
+  );
+
+  return $menu;
+}
+
+/**
+ * Implements HOOK_library()
+ */
+function iwapi_library() {
+  $path = drupal_get_path('module', 'iwapi');
+  
+  return array(
+    'iwapi.core' => array(
+      'title' => 'Image Works API Javascript',
+      'version' => '1.0',
+      'js' => array($path .'/js/iwapi.js' => array('group' => JS_LIBRARY, 'weight' => -1)),
+    ),
+    'iwapi.ajax' => array(
+      'title' => 'Image Works API Javascript',
+      'version' => '1.0',
+      'js' => array($path .'/js/ajax.js' => array('group' => JS_LIBRARY, 'weight' => 5)),
+      'dependencies' => array(
+        array('system', 'ui.dialog'),   // used for the modal pop-up
+        array('system', 'drupal.ajax'), // pull in ajax class and commands
+        array('iwapi', 'iwapi.core'),   // core IW utilities
+      ),
+    ),
+    'iwapi.docking' => array(
+      'title' => 'Image Works Docking Javascript',
+      'version' => '1.0',
+      'js' => array($path .'/js/docking.js' => array('group' => JS_THEME, 'weight' => 20)),
+      'css' => array($path .'/theme/css/docking.css'),
+      'dependencies' => array(
+        array('iwapi', 'iwapi.core'),   // core IW utilities
+      ),
+    ),
+    'iwapi.builders' => array(
+      'title' => 'Image Works Content Builders',
+      'version' => '1.0',
+      'js' => array($path .'/js/content-builders.js' => array('group' => JS_LIBRARY, 'weight' => 20)),
+      'css' => array($path .'/theme/css/content-builders.css'),
+      'dependencies' => array(
+        array('system', 'ui.droppable'),
+        array('system', 'ui.draggable'),
+      ),
+    ),
+    'jquery.json' => array(
+      'title' => 'JQuery-json',
+      'version' => '2.4',
+      'js' => array($path .'/js/jquery.json.min.js' => array('group' => JS_LIBRARY)),
+      'dependencies' => array(
+        array('system', 'jquery'),
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements HOOK_element_info()
+ */
+function iwapi_element_info() {
+  // In an effort to keep the module file clean, I've moved the
+  // long winded definitions into a separate file.
+  iwapi_include('elements');
+  return _iwapi_element_info();
+}
+
+/**
+ * Implements HOOK_hook_info().
+ */
+function iwapi_hook_info() {
+  return array(
+    'iwapi_entity_properties'       => array('group' => 'entity_property'),
+    'iwapi_entity_properties_alter' => array('group' => 'entity_property'),
+  );
+}
+
+/**
+ * Implements HOOK_ctools_plugin_directory().
+ */
+function iwapi_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'panels') {
+    return 'plugins/' . $plugin;
+  }
+}
+
+/**
+ * Implements HOOK_views_api().
+ */
+function iwapi_views_api() {
+  $path = drupal_get_path('module', 'iwapi');
+  return array('api' => 3, 'path' => $path .'/views');
+}
+
+/**
+ * Implements HOOK_block_list_alter().
+ */
+function iwapi_block_list_alter(&$blocks) {
+  $addl = _iwapi_region_inject_block();
+
+  if (class_exists('iwEmbedContent') && !empty(iwEmbedContent::$_regions)) {
+    // Prepend embedded content into specified regions.
+    $blocks = iwEmbedContent::$_regions + $blocks;
+  }
+
+  // Add injected blocks if any are present.
+  if (!empty($addl)) {
+    $blocks = $addl + $blocks;
+  }
+}
+
+/**
+ * Implements HOOK_preprocess_page()
+ */
+function iwapi_preprocess_page(&$vars) {
+  global $hide_page_title;
+
+  // Should the page title be hidden for some reason?
+//  if (!empty($hide_page_title)) {
+//    array_unshift($vars['title_prefix'], array(
+//      '#markup' => '<div class="element-invisible">',
+//      '#weight' => -1000,
+//    ));
+//
+//    $vars['title_suffix'][] = array(
+//      '#markup' => '</div>',
+//      '#weight' => 1000,
+//    );
+//  }
+}
+
+/**
+ * Implements HOOK_theme().
+ */
+function iwapi_theme($existing, $type, $theme, $path) {
+  $base = array(
+    'path' => $path .'/theme', 
+    'file' => 'theme.inc',
+  );
+  
+  return array(
+    'popup_help'       => array('render element' => 'element') + $base,
+    'sort_bin_element' => array('render element' => 'element') + $base,
+    'table_elements'   => array('render element' => 'table') + $base,
+    'iwentity' => array(
+      'render element' => 'elements',
+      'template' => 'iwentity',
+      'pattern' => 'iwentity__',
+    ) + $base,
+    'package_summary' => array(
+      'variables' => array('properties' => array()),
+    ) + $base,
+  );
+}
+
+/**
+ * Implements HOOK_omega_layout_later().
+ */
+function iwapi_omega_layout_alter(&$layout) {
+  global $iwapi_page_layout;
+  
+  // Use helper function to allow other modules 
+  // to swap the page layout easier.
+  if (!empty($iwapi_page_layout)) {
+    $layout = $iwapi_page_layout;
+  }
+}
+
+
+// =============================
+// Menu load & access callbacks
+// =============================
+
+/**
+ * A very simple menu delivery callback to avoid extra processing or
+ * generating too much content or themed items. This would be used in
+ * cases where you do not want any system JS or CSS to be included into
+ * various pages (e.g. Facebook channel callback URL). 
+ *
+ * @param $callback_result
+ *  This will be the callback result for the menu item. If this value 
+ *  is an integer han some other error or access validation has 
+ *  occurred. In this case we fall back to the regular page delivery.
+ */
+function iwapi_deliver_bare_html_page($callback_result) {
+  // Defaults back to normal page delivery for errors or security issues
+  if (is_int($callback_result)) {
+    drupal_deliver_html_page($callback_result);
+  }
+  
+  if (isset($callback_result)) {
+    if (is_null(drupal_get_http_header('Content-Type'))) {
+      drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
+    }
+    if (is_array($callback_result)) {
+      $callback_result += array(
+        'head' => array('#markup' => '<head></head>'),
+        'body' => array('#markup' => '<body></body>'),
+      );
+      print '<html>'. drupal_render($callback_result) .'</html>';
+    }
+  }
+  drupal_page_footer();
+}
+
+
+// =============================
+// Entity hook & callbacks
+// =============================
+
+/**
+ * Quick access to all the entity types which
+ * support the iwEntity class as the base.
+ */
+function _iwapi_get_api_entity_types() {
+  $types = &drupal_static(__FUNCTION__); 
+
+  if (!isset($types)) {
+    $cid = 'iwapi:iwEntity';
+      
+    if ($cache = cache_get($cid)) {
+      $types = $cache->data;
+    }
+    else {
+      $types = array();
+      foreach (entity_get_info() as $type => $info) {
+        if (isset($info['entity class']) && is_subclass_of($info['entity class'], 'iwEntity')) {
+          $types[$type] = $type;
+        }
+      }
+      
+      cache_set($cid, $types); // Save for later quick retrieval.
+    }
+  }
+  
+  return $types;
+}
+
+/**
+ * Determine additional data available for entities
+ * in addition to the normal fields. This will help
+ * determine how to render this information.
+ * 
+ * Every property that is searchable should also include
+ * an "index_type".
+ * 
+ * @return array
+ *  If $type parameter was provided, return the
+ *  properties for this entity type if it exists.
+ *  Otherwise return all known property types.
+ */
+function iwapi_get_entity_properties($type) {
+  $static_data = &drupal_static(__FUNCTION__);
+  $properties  = &$static_data['properties'];
+  $handlers    = &$static_data['handlers'];
+    
+  if (!isset($handlers[$type])) {
+    $cid = 'iwapi_entity_properties:'. $type;
+    
+    if ($cache = cache_get($cid)) {
+      $handlers[$type] = $cache->data;
+    }
+    else {
+      if (!isset($properties)) {
+        $properties = module_invoke_all('iwapi_entity_properties');
+    
+        // Add defaults for core entity information (nodes).
+        require __DIR__ .'/inserts/iwapi_entity_props.inc';
+        $properties = array_merge_recursive($properties, $default_properties);
+  
+        drupal_alter('iwapi_entity_properties', $properties);
+      }
+    
+      if (!empty($properties[$type])) {
+        foreach ($properties[$type] as $name => $info) {
+          $handler = $info['handler'];
+          $handlers[$type][$name] = new $handler($name, $info);
+        }
+        
+        cache_set($cid, $handlers[$type]);
+      }
+      else {
+        $handler[$type] = array();
+      }
+    }
+  }
+  
+  return $handlers[$type];
+}
+
+/**
+ * Default callback for use with generating URI's for
+ * an entity which implements iwEntity base class.
+ * 
+ * @param iwEntity $entity
+ *  The entity to build a URI array from.
+ * @return array
+ *  Array of url components that can be used with url()
+ *  function. It should at minimum contain a "path" and
+ *  possibly the URL options.
+ */
+function iwapi_entity_uri(iwEntity $entity) {
+  return $entity->getUri();
+}
+
+/**
+ * Default callback for use with generating the
+ * entity label / title with classes that
+ * implement iwEntity base class.
+ * 
+ * @param iwEntity $entity
+ *  Entity to get the label for. This will in turn
+ *  call the correct label generating method.
+ * @return string
+ *  The string label to use for the entity.
+ */
+function iwapi_entity_label(iwEntity $entity) {
+  return $entity->getLabel();
+}
+
+/**
+ * Load a single entity based on the entity type.
+ * The arguments are loaded this way to allow use
+ * with HOOK_menu arguments. Generally the ID is
+ * will be the first parameter.
+ * 
+ * @param int $entity_id
+ *  The ID of the entity to load.
+ * @param string $entity_type
+ *   The name of the entity type that is being loaded.
+ * @return object | FALSE
+ *  Either a fully loaded object or 
+ */
+function iwapi_entity_object_load($entity_id, $entity_type, $revision = NULL) {
+  $conds       = array();
+  $entity_type = strtr($entity_type, '-', '_');
+
+  if (isset($revision)) {
+    $entity_info = entity_get_info($entity_type);
+    
+    // Ensure that this entity type has a revisioning first.
+    if (isset($entity_info['entity keys']['revision'])) {
+      $conds = array($entity_info['entity keys']['revision'] => $revision);
+    }
+  }
+  
+  $entities = entity_load($entity_type, array($entity_id), $conds);
+  return reset($entities);
+}
+
+/**
+ * Wrapper which calls the method iwEntity::checkAccess()
+ * to check user access for the entity and operation in question.
+ * 
+ * @param string $op
+ *  The operation being performed. Usually 'update', 'view' 
+ * 'create', or 'delete' (but is specific to the entity).
+ * @param iwEntity $entity
+ *  The entity object being checked for access.
+ * @param stdClass $account
+ *  The user account to check access for.
+ */
+function _iwapi_entity_access($op, iwEntity $entity, $account = NULL) {
+  global $user;
+  
+  if (!isset($account)) {
+    $account = $user;
+  }
+  
+  // Test only for the administrative permissions.
+  // This happens before other modules can chime in.
+  if ($entity->checkAccess($op, $account, TRUE)) {
+    return TRUE;
+  }
+
+  $allowed = FALSE;
+  foreach (module_implements('entity_check_access') as $module) {
+    $callback = $module .'_entity_check_access';
+    
+    $value = $callback($entity, $entity->entityType(), $op, $account);
+    if ($value === ENTITY_ACCESS_DENY) {
+      return FALSE;
+    }
+    elseif ($value === ENTITY_ACCESS_ALLOW) {
+      // Explicitly allowed, but keep going to make sure nothing else 
+      // explicitly denies the request. Deny trumps Allow.
+      $allowed = TRUE;  
+    }
+  }
+
+  return $allowed || $entity->checkAccess($op, $account, FALSE);
+}
+
+/**
+ * Create a possible callback for the Entity API
+ * to use when viewing content. This exposes the
+ * view() method for the iwEntity sub-classes.
+ * 
+ * @param array $entities
+ *  An array of $entities to build the renderable arrays for.
+ * @param string $view_mode
+ *  The view mode being requested of the entity.
+ * @param string $langcode
+ *  The language code to use when rendering the content.
+ * @return array
+ *  Renderable array for each passed entity. Returns FALSE if
+ *  not entities where passed.
+ */
+function _iwapi_entity_view(array $entities, $view_mode, $langcode = NULL) {
+  $display = array();
+
+  foreach ($entities as $key => $entity) {
+    $display[$entity->entityType()][$key] = $entity->view($view_mode, $langcode);
+  }
+
+  return empty($display) ? FALSE : $display;
+}
+
+/**
+ * Get AJAX URIs for entities that support this
+ * HOOK. It allows 
+ */
+function iwapi_get_entity_ajax_uri() {
+  $uris = &drupal_static(__FUNCTION__);
+  
+  if (!isset($uris)) {
+    $cid = __FUNCTION__;
+    if ($cache = cache_get($cid)) {
+      $uris = $cache->data;
+    }
+    else {
+      $uris = module_invoke_all('iwapi_entity_ajax_uri');
+      cache_set($cid, $uris);
+    }
+  }
+  
+  return $uris;
+}
+
+/**
+ * Drupal queue worker callback to delete all entities
+ * with a given criteria.
+ * 
+ * @param array $data
+ *  Array of data which contains the entity type, conditions
+ *  and possible other table joins.
+ */
+function iwapi_entity_clear(array $data) {
+  require_once __DIR__ .'/includes/entity.batch.inc';
+  
+  _iwapi_queue_entity_clear($data);
+}
+
+
+// =============================
+// Utility functions
+// =============================
+
+/**
+ * Some themes include a way to alter or switch
+ * between a layout, but doesn't provide a good 
+ * way for a page to request a specific layout 
+ * to be used. As of now only works with Omega v4.
+ * 
+ * @param string $layout
+ *  Name of the layout to set the page to.
+ *  Supposedly Drupal 8 will be more of a layout
+ *  and block injection style of theming.
+ * @return string | NULL
+ *  If a new layout was provided then NULL, but
+ *  otherwise, return the currently stored $layout.
+ */
+function iwapi_set_page_layout($layout = NULL) {
+  global $iwapi_page_layout;
+  
+  if (!isset($layout)) {
+    return $iwapi_page_layout;
+  }
+  $iwapi_page_layout = $layout;
+}
+
+/**
+ * Allows meddling of page layout changes, by
+ * pushing block content directly into a page region.
+ * Providing a new block adds it, and leaving the
+ * $block parameter NULL or blank, will return
+ * all currently "injected" blocks.
+ * 
+ * @param stdClass $block
+ *  This is an object that should be added to the
+ *  list of items injected into the page regions.
+ * @return array | NULL
+ *  If no block definition was passed as a parameter
+ *  then this function will return all currently
+ *  stored block defintions. If a block is passed to
+ *  this call then there is no return value.
+ */
+function _iwapi_region_inject_block($block = NULL) {
+  static $injected_blocks = array();
+  
+  if (isset($block)) {
+    $block_id = $block->module .'_'. $block->delta;
+    $injected_blocks[$block_id] = $block;
+  }
+  else {
+    return $injected_blocks;
+  }
+}
+
+/**
+ * Load additional functionality from iwapi include files.
+ * 
+ * @param $name
+ *  String name of the functionality to add. This should be the
+ *  name of the file without the extension in most cases.
+ */
+function iwapi_include($name) {
+  // Make sure that the file name is clean, and readable before trying to include it.
+  $filename = dirname(__FILE__) ."/loadable/{$name}.inc";
+  if (preg_match('/[\w\-_]+/', $name) && is_readable($filename)) {
+    require_once $filename;
+  }
+  else {
+    throw new iwException('Failed to include file with name @name.', array('@name' => $name));
+  }
+}
+
+/**
+ * Function which aggregates all the currently available
+ * class information and objects that are available.
+ * Includes addition categorization and label information.
+ * 
+ * @param $type
+ *  String name of the type of handler to retrieve.
+ *  If NULL, the function will return information on
+ *  all available types.
+ * @param $reset
+ *  Whether or not we want to reset the internal cache
+ *  and rebuild the handler information.
+ */
+function iwapi_get_class_info($type = NULL, $reset = FALSE) {
+  static $class_info = NULL;
+  
+  if ($reset || !isset($class_info)) {
+    // Depending on when this function is called, different set of classes maybe available.
+    // if called without a full bootstrap, fallback to only core classes being available.
+    if (drupal_bootstrap() === DRUPAL_BOOTSTRAP_FULL) {
+      if (!$reset && $cache = cache_get(__FUNCTION__, 'cache')) {
+        $class_info = $cache->data;
+      }
+      else {
+        include __DIR__ .'/inserts/iwapi_classes.inc';
+        
+        $class_info = module_invoke_all('iwapi_class_info') + $default_classes;
+        drupal_alter('iwapi_class_info', $class_info);
+        cache_set(__FUNCTION__, $class_info, 'cache', CACHE_PERMANENT);
+      }
+    }
+    else {
+      // Since this is a temporary and incomplete listing of what's
+      // available, we do not check or save to the Drupal cache
+      include __DIR__ .'/inserts/iwapi_classes.inc';
+      $class_info = $default_classes;
+    }
+  }
+
+  // If no type specified, return all classes.
+  if (empty($type)) {
+    return $class_info; 
+  }
+  return isset($class_info[$type]) ? $class_info[$type] : array();
+}
+
+
+// ===============================
+// Array traversals & callbacks
+// ===============================
+
+/**
+ * Extract a specific field from an array, creating a new array
+ * which has the same keys as before, but only a single value
+ * from the sub-array. So 
+ *   array(
+ *     'item1' => array('label' => 'first'),
+ *     'item2' => array('label' => 'second'),
+ *   );
+ * 
+ * becomes
+ *   array(
+ *     'item1' => 'first',
+ *     'item2' => 'second',
+ *   );
+ * 
+ * @param $items
+ *  An array of items to go through, and retrieve labels for.
+ * @param $field
+ *  The name of the field or property to retrieve.
+ */
+function _iwapi_extract_field(array $items, $field = 'label') {
+  // I thought about using lambda / closures, but they
+  // run significantly slower than standard functions.
+  if (is_object(reset($items))) {
+    // Create a copy and not modify the original reference.
+    $rs = array();
+    foreach ($items as $key => $value) {
+      $rs[$key] = $value->{$field};
+    }
+    
+    return $rs;
+  }
+  else {
+    array_walk($items, '_iwapi_extract_array_field', $field);
+    return $items;
+  }
+}
+
+/**
+ * Function usable by array_walk to pull a value from
+ * and array and by reference set it as the original array
+ * value.
+ * 
+ * @param array $item
+ *  Array from the original array to modify the value for.
+ * @param <mixed> $key
+ *  The parent / original array index key.
+ * @param string $field
+ *  The name of the index of $item to extract.
+ */
+function _iwapi_extract_array_field(array &$item, $key, $field) {
+  $item = $item[$field];
+}
+
+/**
+ * Add a prefix to the $item value. Usually used with
+ * array_walk to allow quick traversal of arrays.
+ * 
+ * @param type $item
+ *  Reference to the value being modified.
+ * @param string $key
+ *  The array key index (unused, but required by array_walk()).
+ * @param string $prefix
+ *  The string value to use as a prefix.
+ */
+function _iwapi_prefix_value(&$item, $key, $prefix) {
+  $item = "{$prefix}{$item}";
+}
+
+/**
+ * Remove 'X' number of characters from the start of a
+ * string. Is meant to be use with array_walk().
+ * 
+ * @param string $item
+ *  Reference to a string, which will be modified.
+ * @param type $key
+ *  The index used by the array.
+ * @param type $count
+ *  The number of characters to remove.
+ */
+function _iwapi_ltrunc_value(&$item, $key, $count = 0) {
+  $item = substr($item, $count);
+}

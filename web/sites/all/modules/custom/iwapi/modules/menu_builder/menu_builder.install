@@ -1,0 +1,53 @@
+<?php
+/**
+ * @file menu_builder.install
+ * Menu builder module install and update functions.
+ */
+
+/**
+ * Implements HOOK_schema().
+ */
+function menu_builder_schema() {
+  $schema['menu_builder_styles'] = array(
+    'description' => 'Maintains menu builder information that extends the core menu item.',
+    'fields' => array(
+      'mlid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The {menu_links}.mlid. The value of 0 is used as root menu settings.',
+      ),
+      'menu_name' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+      'style' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => 'columns',
+        'description' => 'Reference name of the handler type to use when rendering this item\'s sub-items.'
+      ),
+      'data' => array(
+        'type' => 'blob',
+        'serialize' => TRUE,
+        'description' => 'Menu item settings for the handler, and additional elements to include.',
+      ),
+    ),
+    'primary key' => array('mlid', 'menu_name'),
+    'indexes' => array(
+      'menu_name' => array('menu_name'),
+    ),
+    'foreign keys' => array(
+      'menu' => array(
+        'table' => 'menu_links',
+        'columns' => array(
+          'mlid' => 'mlid',
+          'menu_name' => 'menu_name',
+        ),
+      ),
+    ),
+  );
+  return $schema;
+}

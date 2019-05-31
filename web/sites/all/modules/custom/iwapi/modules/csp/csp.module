@@ -1,0 +1,513 @@
+<?php
+/**
+ * @file csp.module
+ *  Core Drupal module hooks for the CSP module
+ */
+
+define('CSP_PERM_ADMIN', 'Administer CSP workflows');
+define('CSP_PERM_EDIT_PUBLISHED', 'allow editing published states');
+
+
+/**
+ * Implements HOOK_permission().
+ */
+function csp_permission() {
+  $perms[CSP_PERM_ADMIN] = array(
+    'title' => t('Administer editorial workflows through CSP module.'),
+    'description' => t('Allowed the creation, assignment and editing of workflows and workflow states.'),
+    'restrict access' => TRUE,
+  );
+
+  // Iterate through the workflows and create access for each of the workflow states
+  $query = db_select('csp_flows', 'fl')->fields('fl', array('flow', 'label'));
+  foreach ($query->execute() as $row) {
+    $t_params = array('%label' => $row->label);
+    
+    $perms["use own CSP $row->flow states"] = array(
+      'title' => t('Use %label workflow states with <strong>own</strong> content', $t_params),
+    );
+    $perms["use any CSP $row->flow states"] = array(
+      'title' => t('Use %label workflow states with <strong>any</strong> content', $t_params),
+    );
+    $perms["use admin CSP $row->flow states"] = array(
+      'title' => t('Use %label administrative workflow states.', $t_params),
+    );
+    $perms["alter published CSP $row->flow entity"] = array(
+      'title' => t('Allowed to edit content in a published %label state.', $t_params),
+      'description' => t('User can edit published content, but not republish afterward.'),
+      'restrict access' => TRUE,  
+    );
+  }
+
+  return $perms;
+}
+
+/**
+ * Implements HOOK_menu().
+ */
+function csp_menu() {
+  $menu = array(
+    'admin/config/content/csp' => array(
+      'type' => MENU_NORMAL_ITEM,
+      'title' => 'Structured Publishing (CSP)',
+      'description' => 'Create and Configure editorial workflows to control content publishing.',
+      'page callback' => 'csp_workflow_overview_page',
+      'access arguments' => array(CSP_PERM_ADMIN),
+      'file' => 'pages/admin.inc',
+    ),
+    'admin/config/content/csp/overview' => array(
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'title' => 'Overview',
+      'weight' => -10,
+    ),
+    
+    // Administer types.
+    'admin/config/content/csp/admin-types' => array(
+      'type' => MENU_LOCAL_TASK,
+      'title' => 'Entity Types',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('csp_workflow_manage_types', 'node'),
+      'access arguments' => array(CSP_PERM_ADMIN),
+      'file' => 'pages/admin.inc',
+    ),
+    'admin/config/content/csp/admin-types/node' => array(
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'title' => t('Node'),
+      'weight' => -5,
+    ),
+   
+    // Add & Edit workflows
+    'admin/config/content/csp/add-workflow' => array(
+      'type' => MENU_LOCAL_ACTION,
+      'title' => 'Add New Workflow',
+      'page callback' => 'csp_workflow_edit_page',
+      'access arguments' => array(CSP_PERM_ADMIN),
+      'file' => 'pages/admin.inc',
+    ),
+    'admin/config/content/csp/%csp_workflow/edit' => array(
+      'type' => MENU_CALLBACK,
+      'title' => 'Delete Workflow',
+      'page callback' => 'csp_workflow_edit_page',
+      'page arguments' => array(4),
+      'access arguments' => array(CSP_PERM_ADMIN),
+      'file' => 'pages/admin.inc',
+    ),
+  );
+  
+  // Delete can perform in AJAX mode.
+  $has_ajax['admin/config/content/csp/no-js/%csp_workflow/delete'] = array(
+    'type' => MENU_CALLBACK,
+    'title' => 'Delete Workflow',
+    'page callback' => 'csp_workflow_delete_confirm_page',
+    'page arguments' => array(5),
+    'access arguments' => array(CSP_PERM_ADMIN),
+    'file' => 'pages/admin.inc',
+  );
+  
+  iwapi_include('menu');
+  _iwapi_menu_add_ajax_items('csp', $has_ajax, $menu);
+  
+  return $menu;
+}
+
+/**
+ * Implements HOOK_views_api()
+ */
+function csp_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'csp') .'/views',
+  );
+}
+
+
+// ---------------------------------------
+// Triggers and Actions
+// ---------------------------------------
+
+/**
+ * Implements HOOK_trigger_info()
+ */
+function csp_trigger_info() {
+  $triggers = array();
+  
+  $query = db_select('csp_flows', 'fl')->fields('fl', array('flow'));
+  foreach ($query->execute() as $row) {
+    $workflow = CspController::Load($row->flow);
+    
+    foreach ($workflow->states as $state => $state_info) {
+      $triggers["csp_{$workflow->flow}_{$state}_changed"] = array(
+        'label' => t('Content state has changed to %flow: %state', array(
+          '%flow' => $workflow->label,
+          '%state' => $state_info['label'],
+        )),
+      );
+    }
+  }
+  
+  return array('csp' => $triggers);
+}
+
+/**
+ * Centralized workflow trigger
+ * 
+ * @param $entity
+ *  The entity that triggered the content state change.
+ * @param $type
+ *  The entity type of $entity.
+ * @param $hook
+ *  The hook that just triggered (the workflow and state).
+ */
+function _csp_trigger_state_changed($entity, $type, $workflow, $state) {
+  static $recursion;  // Prevent recursion by tracking called HOOKs
+  
+  if (!module_exists('trigger')) {
+    return;
+  }
+  
+  $hook = "csp_{$workflow->flow}_{$state}_changed";
+  if (empty($recursion[$hook]) && $aids = trigger_get_assigned_actions($hook)) {
+    $recursion[$hook] = TRUE;
+    
+    // Trigger associated actions
+    $context = array(
+      'hook' => $hook,
+      'group' => $type,
+      'entity_type' => $type,
+      $type => $entity,
+    );
+    
+    foreach ($aids as $aid => $info) {
+      actions_do($aid, $entity, $context);
+    }
+    
+    // Action completed so reset hook for another possible iteration.
+    unset($recursion[$hook]);
+  }
+}
+
+
+// ---------------------------------------
+// Entity HOOKs and access
+// ---------------------------------------
+
+/**
+ * Implements HOOK_node_access()
+ */
+function csp_node_access($node, $op, $account) {
+  return csp_entity_check_access($node, 'node', $op, $account);
+}
+
+/**
+ * Implements HOOK_entity_check_access()
+ */
+function csp_entity_check_access($entity, $type, $op, $account) {    
+  switch ($op) {
+    case 'view':
+      $published = ($type == 'node') && ($entity->status == NODE_PUBLISHED);
+      $published = $published || ($entity instanceof iwEntity && $entity->isActive());
+
+      if ($published) {
+        return ENTITY_ACCESS_IGNORE; // ignore published information
+      }
+    case 'edit':   case 'modify':
+    case 'insert': case 'update':
+    case 'delete': case 'remove':
+      // Load the related workflows and check the access to the current state.
+      $workflows = CspController::EntityWorkflows($entity, $type);
+      CspController::LoadEntityStates($entity, $type, $workflows);
+      
+      // Any active workflow can deny access.
+      foreach ($workflows as $id => $flow) {
+        $state = $entity->csp[$id];
+
+        if (!$flow->checkAccess($entity, $type, $op, $state, $account)) {
+          return ENTITY_ACCESS_DENY;
+        }
+      }
+  }
+
+  return ENTITY_ACCESS_IGNORE; // This module will never explicitly allow, only deny.
+}
+
+/**
+ * Implements HOOK_query_TAG_alter().
+ */
+function csp_query_alter(QueryAlterableInterface $query) {
+  if (isset($query->alterTags)) {
+    $tagStr = implode(',', array_keys($query->alterTags));
+    $types  = array('node' => 'node') + _iwapi_get_api_entity_types();
+  
+    if (preg_match('#(?:^|,)('. implode('|', $types) .')_access(,|$)#', $tagStr, $matches)) {
+      include_once __DIR__ .'/includes/query_alter.inc';
+ 
+      _csp_query_entity_access_alter($query, $matches[1]);
+    }
+  }
+}
+
+/**
+ * Implements HOOK_entity_presave().
+ */
+function csp_entity_presave($entity, $type) {
+  foreach (CspController::EntityWorkflows($entity, $type) as $id => $flow) {
+    // Make any changes to the node based on state to the entity before saving.
+    // In most cases this will be related to the publishing state.
+    $flow->alterState($entity, $type, $entity->csp[$id]);
+  }
+}
+
+/**
+ * Implements HOOK_entity_insert()
+ * 
+ * Trigger the change events for the workflow changes. Happens after saving.
+ */
+function csp_entity_insert($entity, $type) {
+  foreach (CspController::EntityWorkflows($entity, $type) as $id => $flow) {
+    // Save state changes after the ID has been created.
+    $flow->saveState($entity, $type, $entity->csp[$id]);
+
+    _csp_trigger_state_changed($entity, $type, $flow, $entity->csp[$id]);
+  }
+}
+
+/**
+ * Implements HOOK_entity_update()
+ * 
+ * Trigger the change events for the workflow changes. Happens after saving.
+ */
+function csp_entity_update($entity, $type) {
+  $original  = $entity->original;
+  $workflows = CspController::EntityWorkflows($entity, $type);
+  
+  if (!empty($workflows)) {
+    CspController::LoadEntityStates($original, $type, $workflows, FALSE);
+    
+    foreach ($workflows as $id => $flow) {
+      $flow->saveState($entity, $type, $entity->csp[$id]);
+      
+      // Trigger event to show change happened.
+      if (empty($original->csp[$id]) || $original->csp[$id] != $entity->csp[$id]) {
+        _csp_trigger_state_changed($entity, $type, $flow, $entity->csp[$id]);
+      }
+    }
+  }
+}
+
+/**
+ * Implements HOOK_entity_view().
+ */
+function csp_entity_view($entity, $type, $view_mode, $langcode) {
+  if (($type === 'node' && $entity->status != NODE_PUBLISHED)
+    || ($entity instanceof iwEntity && !$entity->isActive())) {
+
+    $flows = CspController::EntityWorkflows($entity, $type);
+    if (empty($flows)) {
+      return;
+    }
+
+    // For unpublished content, include the workflow status.
+    $entity->content['csp'] = array(
+      '#type' => 'container',
+      '#weight' => -5,
+      '#attributes' => array(
+        'id' => 'csp-workflows',
+        'class' => array('workflows', 'clearfix'),
+      ),
+    );
+
+    // For each applicable workflow, append the status to be displayed.
+    CspController::LoadEntityStates($entity, $type, $flows);
+    foreach ($flows as $id => $flow) {
+      $state = $flow->states[$entity->csp[$id]];
+
+      $entity->content['csp'][$id] = array(
+        '#type' => 'container',
+        '#attributes' => array(
+          'id' => 'csp-flow-'. strtr($flow->name, '_', '-'),
+          'class' => array('csp-state-item', 'clearfix'),
+        ),
+        
+        'label' => array(
+          '#prefix' => '<span class="workflow-label">',
+          '#suffix' => '</span>',
+          '#markup' => t(check_plain($flow->label)) .': ',
+        ),
+        'state' => array(
+          '#prefix' => '<span class="workflow-value">',
+          '#suffix' => '</span>',
+          '#markup' => t(check_plain($state['label'])),
+        ),
+      );
+      
+      if ($state['flags'] & CspFlow::FLAG_ADMIN) {
+        $entity->content['csp'][$id]['#attributes']['class'][] = 'admin-state';
+      }
+    }
+  }
+}
+
+/**
+ * Implements HOOK_entity_delete().
+ */
+function csp_entity_delete($entity, $type) {
+  $info = variable_get("csp_{$type}_bundles", array());
+  list($id, $rev, $bundle) = entity_extract_ids($type, $entity);
+  
+  // Clean up CSP related information related to this entity.
+  try {
+    if ($type == 'user') {
+      db_delete('csp_admins')
+        ->condition('uid', $id)
+        ->execute();
+    }
+    elseif (isset($info[$bundle])) {
+      db_delete('csp_entities')
+        ->condition('entity_type', $type)
+        ->condition('entity_id', $id)
+        ->execute();
+    }
+  }
+  catch (Exception $e) {
+    watchdog_exception('csp', $e);
+    throw $e;
+  }
+}
+
+/**
+ * Implements HOOK_field_extra_fields().
+ */
+function csp_field_extra_fields() {
+  $varnames = db_select('variable', 'v')
+    ->fields('v', array('name'))
+    ->condition('v.name', 'csp_%_bundles', 'LIKE')
+    ->execute()->fetchCol();
+  
+  $extras = array();
+  foreach ($varnames as $name) {
+    $bundles = variable_get($name, array());
+    
+    if (!empty($bundles) && preg_match('#^csp_([\w_]+)_bundles$#', $name, $matches)) {
+      $extras[$matches[1]] = array_fill_keys(array_keys($bundles), array(
+        'form' => array(
+          'csp' => array(
+            'label' => t('CSP Workflows'),
+            'description' => t('Settings for the entity\'s workflow state.'),
+            'weight' => -10,
+          ),
+        ),
+        'display' => array(
+          'csp' => array(
+            'label' => t('CSP Workflows'),
+            'description' => t('Display the entity\'scurrent workflow state.'),
+            'weight' => -10,
+          ),
+        ),
+      ));
+    }
+  }
+}
+
+
+// ---------------------------------------
+// Form functions
+// ---------------------------------------
+
+/**
+ * Implements Drupal HOOK_form_alter()
+ */
+function csp_form_alter(&$form, &$form_state, $form_id) {
+  if (empty($form['#entity_type']) || empty($form['#bundle'])) {
+    return;
+  }
+  
+  $type = $form['#entity_type'];
+  if (empty($form_state[$type])) {
+    return;
+  }
+
+  // We know where the entity data is, and workflows.
+  $entity = $form_state[$type];
+  $flows  = CspController::EntityWorkflows($entity, $type);
+  
+  if (!empty($flows)) {
+    global $user;
+    
+    if (isset($form['options']['status'])) {
+      $form['options']['status']['#access'] = FALSE;
+    }
+    elseif ($form['status']) {
+      $form['options']['status']['#access'] = FALSE;
+    }
+    
+    $form['csp'] = array(
+      '#type' => 'container',
+      '#tree' => TRUE,
+      '#attributes' => array(
+        'id' => 'structured-publishing',
+        'class' => array('csp-wrapper', 'clearfix'),
+      ),
+    );
+    
+    // Load the entity state information for all workflows.
+    CspController::LoadEntityStates($entity, $type, $flows);
+    foreach ($flows as $id => $flow) {
+      $s_opts = $flow->allowedStates($entity, $type, $user);
+      
+      if (empty($s_opts)) {
+        $form['csp'][$id] = array(
+          '#type' => 'value',
+          '#value' => $entity->csp[$id],
+        );
+      }
+      else {
+        $form['csp'][$id] = array(
+          '#type' => 'select',
+          '#title' => t('%label state', array('%label' => $flow->label)),
+          '#options' => $s_opts,
+          '#required' => TRUE,
+          '#default_value' => $entity->csp[$id],
+        );
+      }
+    }
+  }
+}
+
+
+// ---------------------------------------
+// Utility functions
+// ---------------------------------------
+
+/**
+ * Load an individual workflow. Is a wrapper for the
+ * static CspFlow::Load() method.
+ * 
+ * @param $id
+ *  {csp_flow}.flow of the workflow is requested to be loaded.
+ * @return CspFlow
+ *  Fully loaded workflow object from the data in {csp_flow}
+ */
+function csp_workflow_load($id) {
+  return CspController::Load($id);
+}
+
+/**
+ * Retrieves a field from users that are listed as
+ * administrators of a given workflow.
+ * 
+ * @param CspFlow | int $workflow
+ *  The workflow object with administrators to request fields from.
+ * @param $field
+ *  The user field to capture from the database. Only allowing 
+ *  'name' and 'mail' at this juncture. 
+ */
+function _csp_get_admins_field($workflow, $field = 'name') {
+  switch ($field) {
+    case 'name':
+    case 'mail':
+      $flow = ($workflow instanceof CspFlow) ? $workflow : CspController::Load($workflow);
+      return ($flow) ? _iwapi_extract_field($flow->getAdmins(), $field) : array();
+  }
+
+  return array();
+}

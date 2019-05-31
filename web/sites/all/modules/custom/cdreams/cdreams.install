@@ -1,0 +1,190 @@
+<?php
+/**
+ * @file
+ * Installation hooks and schemas.
+ */
+
+
+/**
+ * Implements HOOK_install().
+ */
+function cdreams_install() {
+  iwapi_include('entity');
+  
+  // install the pre-packaged content type definitions.
+  _iwapi_install_entity_templates_dir(__DIR__ .'/entity_templates', TRUE);
+}
+
+/**
+ * Implements HOOK_schema().
+ */
+function cdreams_schema() {
+  $schema['cdreams_ordering'] = array(
+    'description' => 'Maintains the ordering of content on the homepage.',
+    'fields' => array(
+      'entity_type' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => 'node',
+      ),
+      'entity_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'rev' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'promoted' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'default' => 0,
+        'description' => 'Flag to elevate content to the top.',
+      ),
+      'date' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Date to use for ordering, will be recorded by day granularity.',
+      ),
+      'weight' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The tie breaker for when the dates by granularity are the same.',
+      ),
+      'created' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Date this entity was created.',
+      ),
+    ),
+    'primary key' => array('entity_type', 'entity_id'),
+    'indexes' => array('weight' => array('promoted', 'date', 'weight')),
+  );
+  
+  return $schema;
+}
+
+
+// =============================
+// Update functions
+// =============================
+
+/**
+ * Update all headline articles to have proper
+ * content ordering 
+ */
+function cdreams_update_7100(&$sandbox) {
+  if (!db_field_exists('cdreams_ordering', 'rev')) {
+    db_add_field('cdreams_ordering', 'rev', array(
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 0,
+    ));
+  }
+
+  $query = db_select('node', 'n')
+    ->fields('n', array('nid'))
+    ->condition('type', 'headline')
+    ->orderBy('nid');
+  
+  $query->leftJoin(
+    'cdreams_ordering', 'o',
+    'o.entity_type=:type AND o.entity_id=n.nid',
+    array(':type' => 'node')
+  );
+  
+  $cond = db_or()
+    ->isNull('o.date')
+    ->isNull('o.weight');
+
+  $query->condition($cond);
+
+  // Initiate the batch if not already started.
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['current'] = 0;
+      
+    $sandbox['total'] = $query->countQuery()->execute()->fetchField();
+    if ($sandbox['total'] == 0) {
+      $sandbox['#finished'] = 1;
+      return;
+    }
+  }
+
+  $query->condition('n.nid', $sandbox['current'], '>');
+  $nids = $query->range(0, 50)->execute()->fetchCol();
+  
+  foreach (node_load_multiple($nids) as $nid => $node) {
+    _cdreams_save_node_ordering($node);
+ 
+    $sandbox['current'] = $nid;
+    ++$sandbox['progress'];
+  }
+  
+  $sandbox['#finished'] = $sandbox['progress'] / $sandbox['total'];
+}
+
+/**
+ * Create the missing revisions column in the cdreams_ordering table.
+ */
+function cdreams_update_7101(&$sandbox) {
+  if (!db_field_exists('cdreams_ordering', 'rev')) {
+    db_add_field('cdreams_ordering', 'rev', array(
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 0,
+    ));
+  }
+
+  $query = db_select('node', 'n')
+    ->fields('n', array('nid'))
+    ->condition('type', array('headline', 'views_article', 'newswire'))
+    ->orderBy('nid');
+  
+  $query->leftJoin(
+    'cdreams_ordering', 'o',
+    'o.entity_type=:type AND o.entity_id=n.nid',
+    array(':type' => 'node')
+  );
+  
+  $query->condition(db_or()
+    ->condition('o.rev', 0)
+    ->isNull('o.rev')
+  );
+
+  // Initiate the batch if not already started.
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['current'] = 0;
+      
+    $sandbox['total'] = $query->countQuery()->execute()->fetchField();
+    if ($sandbox['total'] == 0) {
+      $sandbox['#finished'] = 1;
+      return;
+    }
+  }
+  
+  $query->condition('n.nid', $sandbox['current'], '>');
+  $nids = $query->range(0, 50)->execute()->fetchCol();
+  
+  foreach (node_load_multiple($nids) as $nid => $node) {
+    _cdreams_save_node_ordering($node);
+ 
+    $sandbox['current'] = $nid;
+    ++$sandbox['progress'];
+  }
+
+  $sandbox['#finished'] = $sandbox['progress'] / $sandbox['total'];
+}

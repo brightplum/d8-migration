@@ -1,0 +1,1023 @@
+<?php
+/**
+ * @file
+ * Customizations and settings for Common Dreams.
+ */
+
+define('CDREAMS_DOMAIN_CANONICAL', 0);
+define('CDREAMS_DOMAIN_CURRENT', 1);
+
+define('CDREAMS_VAR_ORDERING_DATA_TTL', 'cdreams_ordering_data_ttl');
+define('CDREAMS_VAR_DOMAIN_FILTER', 'cdreams_domain_filter');
+
+
+/**
+ * Implements HOOK_cron().
+ */
+function cdreams_cron() {
+  $ttl = _cdreams_get_ordering_ttl();
+
+  db_delete('cdreams_ordering')
+    ->condition('date', REQUEST_TIME - $ttl, '<')
+    ->execute();
+}
+
+function cdreams_pwa_manifest_alter(&$manifest) {
+
+  // Change array-based properties. In this case we're manually specifying which
+  // icons will appear in the manifest. Normally you have to specify each size
+  // listed here to meet criteria for "Add to Homescreen"
+  $manifest['icons'] = [
+    [
+      'src' => url(drupal_get_path('theme', 'omega_dreams') . '/images/commondreams-earth-logo-512-2.png'),
+      'sizes' => '512x512',
+      'type' => 'image/png',
+    ],
+    [
+      'src' => url(drupal_get_path('theme', 'omega_dreams') . '/images/commondreams-earth-logo-192-2.png'),
+      'sizes' => '192x192',
+      'type' => 'image/png',
+    ],
+    [
+      'src' => url(drupal_get_path('theme', 'omega_dreams') . '/images/commondreams-earth-logo-144-2.png'),
+      'sizes' => '144x144',
+      'type' => 'image/png',
+    ],
+    [
+      'src' => url(drupal_get_path('theme', 'omega_dreams') . '/images/commondreams-earth-logo-2.svg'),
+      'type' => 'image/svg+xml',
+    ],
+  ];
+}
+
+/**
+ * Implements HOOK_init()
+ */
+function cdreams_init() {
+  drupal_add_library('iwapi', 'iwapi.core');
+  drupal_add_js(drupal_get_path('module', 'cdreams') .'/js/landing-page.js');
+}
+
+/**
+ * Implements HOOK_menu()
+ */
+function cdreams_menu() {
+  $menu = array();
+
+  if (module_exists('d6_importer')) {
+    $menu['admin/config/system/cdreams-import'] = array(
+      'title' => 'Common Dreams Import',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('cdreams_import_data_form'),
+      'access arguments' => array('administer site configuration'),
+      'file' => 'pages/import.inc',
+      'description' => 'Import various node content from the old common dreams.',
+    );
+
+    $menu['admin/config/system/cdreams-import/import'] = array(
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'title' => 'Import Content',
+      'weight' => -5,
+    );
+  }
+
+  $menu['admin/content/hp-ordering'] = array(
+    'type' => MENU_LOCAL_TASK,
+    'title' => 'HP Ordering',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('cdreams_manage_news_ordering_form'),
+    'access arguments' => array('administer content types'),
+    'file' => 'pages/ordering.inc',
+    'weight' => 50,
+    'description' => 'Allow administrators to control ordering for the home page displays.',
+  );
+
+  // Ordering
+  $menu += array(
+    'admin/content/hp-ordering/news' => array(
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'title' => 'News',
+      'weight' => -10,
+    ),
+    'admin/content/hp-ordering/views' => array(
+      'type' => MENU_LOCAL_TASK,
+      'title' => 'Views',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('cdreams_manage_hp_articles_form', 'views_article'),
+      'access arguments' => array('administer content types'),
+      'file' => 'pages/ordering.inc',
+      'weight' => 5,
+    ),
+    'admin/content/hp-ordering/newswire' => array(
+      'type' => MENU_LOCAL_TASK,
+      'title' => 'Newswire',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('cdreams_manage_hp_articles_form', 'newswire'),
+      'access arguments' => array('administer content types'),
+      'file' => 'pages/ordering.inc',
+      'weight' => 10,
+    ),
+  );
+
+  // Customized configurations pages.
+  $menu['admin/config/content/cdreams'] = array(
+    'title' => 'Common Dreams Content',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('cdreams_content_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'pages/admin.inc',
+    'description' => 'Manage settings for custom content display settings.',
+  );
+
+  $menu['admin/config/content/cdreams/ordering'] = array(
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'title' => 'Ordering',
+    'weight' => -5,
+  );
+
+  $menu['admin/config/content/cdreams/domains'] = array(
+    'type' => MENU_LOCAL_TASK,
+    'title' => 'Domain Filtering',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('cdreams_domain_filter_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'pages/admin.inc',
+    'description' => 'Manage settings for how domains are filtered from content.',
+  );
+
+  $menu['node/%node/ajax-edit'] = array(
+    'type' => MENU_CALLBACK,
+    'title' => 'Edit node (AJAX)',
+    'delivery callback' => 'ajax_deliver',
+    'page callback' => '_cdreams_ajax_node_edit',
+    'page arguments' => array(1),
+    'access callback' => 'node_access',
+    'access arguments' => array('update', 1),
+    'theme callback' => 'ajax_base_page_theme',
+    'description' => 'Edit a node using an modal dialog box.',
+  );
+
+  $article_prefix = _cdreams_get_article_prefixes();
+  foreach ($article_prefix as $prefix => $type) {
+    $menu["$prefix/%/%"] = array(
+      'title' => 'Article Archive Page',
+      'page callback' => '_cdreams_article_archive_page',
+      'page arguments' => array(0, 1, 2),
+      'access arguments' => array('access content'),
+    );
+  }
+
+  return $menu;
+}
+
+/**
+ * Implements HOOK_views_api()
+ */
+function cdreams_views_api() {
+  $mod_path = drupal_get_path('module', 'cdreams');
+
+  return array(
+    'api' => 3,
+    'path' => $mod_path .'/views',
+    'template path' => $mod_path .'/themes',
+  );
+}
+
+/**
+ * Implements HOOK_ctools_plugin_api()
+ */
+function cdreams_ctools_plugin_api($module, $api) {
+  if ($module == 'page_manager' && $api == 'pages_default') {
+    return array(
+      'version' => 1,
+      'path' => drupal_get_path('module', 'cdreams') .'/panels',
+    );
+  }
+  elseif ($module == 'context' && $api == 'context') {
+    return array('version' => 3);
+  }
+}
+
+/**
+ * Implements HOOK_filter_info().
+ */
+function cdreams_filter_info() {
+  return array(
+    'cdreams_domains' => array(
+      'title' => t('Common Dreams domains filter'),
+      'description' => t('Converts domains in absolute URLs from'),
+      'process callback' => '_cdreams_domain_filter',
+      'tips callback' => '_cdreams_domain_filter_tips',
+    ),
+  );
+}
+
+/**
+ * Implements HOOK_entity_view().
+ */
+function cdreams_entity_view($entity, $type, $view_mode, $langcode) {
+  $inline_types = array(
+    'further', 'headline', 'newswire',
+    'views_article', 'video_article',
+  );
+
+  if ($type == 'node' && node_is_page($entity) && in_array($entity->type, $inline_types)) {
+    global $hide_page_title;
+    $hide_page_title = TRUE;
+
+    $entity->content['configurable_page_title'] = array(
+      '#theme' => 'html_tag',
+      '#tag' => 'h1',
+      '#value' => '<span itemprop="mainEntityOfPage">' . drupal_get_title() . '</span>',
+      '#attributes' => array(
+        'class' => array('node__title', 'managed-node-title'),
+        'itemprop' => 'headline'
+      ),
+    );
+  }
+}
+
+/**
+ * Implements HOOK_entity_presave().
+ */
+function cdreams_entity_presave($entity, $type) {
+  $lang = entity_language($type, $entity);
+  if (!isset($lang)) {
+    $lang = LANGUAGE_NONE;
+  }
+
+  list($id, $rev, $bundle) = entity_extract_ids($type, $entity);
+
+  foreach (array('field_hp_title', 'field_hp_author') as $field_name) {
+    $instance = field_info_instance($type, $field_name, $bundle);
+    $items    = field_get_items($type, $entity, $field_name);
+
+    if ($instance && (empty($items[0]['value']) || !is_string($items[0]['value']))) {
+      $func = '_cdreams_default_'. preg_replace('/^field_/', '', $field_name) .'_value';
+      $entity->{$field_name}[$lang] = $func($entity, $type);
+    }
+  }
+}
+
+/**
+ * Implements HOOK_node_insert().
+ */
+function cdreams_node_insert($node) {
+  if (in_array($node->type, array('headline', 'views_article', 'newswire'))) {
+    _cdreams_save_node_ordering($node);
+  }
+}
+
+/**
+ * Implements HOOK_node_update().
+ */
+function cdreams_node_update($node) {
+  if (in_array($node->type, array('headline', 'views_article', 'newswire'))) {
+    _cdreams_save_node_ordering($node);
+  }
+}
+
+/**
+ * Implements HOOK_field_extra_fields().
+ */
+function cdreams_field_extra_fields() {
+  $extras = array();
+
+  if (module_exists('shareaholic')) {
+    $settings = ShareaholicUtilities::get_settings();
+
+    foreach (node_type_get_names() as $type => $name) {
+      if (isset($settings['share_buttons']["{$type}_above_content"])
+          && $settings['share_buttons']["{$type}_above_content"] === 'on') {
+
+        $extras['node'][$type]['display']["shareaholic_share_buttons_{$type}_above_content"] = array(
+          'label' => t("Shareaholic Above"),
+          'description' => t("The Shareaholic widget that normally appears above content."),
+          'weight' => -1000,
+        );
+      }
+
+      if (isset($settings['share_buttons']["{$type}_below_content"])
+          && $settings['share_buttons']["{$type}_below_content"] === 'on') {
+
+        $extras['node'][$type]['display']["shareaholic_share_buttons_{$type}_below_content"] = array(
+          'label' => t("Shareaholic below"),
+          'description' => t("The Shareaholic widget that normally appears below content."),
+          'weight' => 1000,
+        );
+      }
+    }
+  }
+
+  $inline_types = array(
+    'further', 'headline', 'newswire',
+    'views_article', 'video_article',
+  );
+
+  foreach ($inline_types as $type) {
+    $extras['node'][$type]['display']['configurable_page_title'] = array(
+      'label' => t('Configurable page title'),
+      'description' => t('Allows placement of the page title. Only works on page views.'),
+      'weight' => -5,
+    );
+  }
+
+  return $extras;
+}
+
+/**
+ * Implements HOOK_apachesolr_query_alter().
+ */
+function cdreams_apachesolr_query_alter($query) {
+  $query->addParam('fl', 'ds_field_article_date');
+  // $query->addParam('fl', 'ss_field_hp_author');
+}
+
+/**
+ * Implements HOOK_image_default_styles()
+ */
+function cdreams_image_default_styles() {
+  return array(
+    'cd_bio_small' => array(
+      'label' => 'CD Bio Small (65x65)',
+      'effects' => array(
+        array(
+          'name' => 'image_scale_and_crop',
+          'data' => array('width' => '65', 'height' => '65'),
+          'weight' => 0,
+        ),
+      ),
+    ),
+    'cd_small_thumb' => array(
+      'label' => 'CD Small Thumb (191x100)',
+      'effects' => array(
+        array(
+          'name' => 'image_scale',
+          'data' => array('width' => '191', 'height' => '', 'upscale' => 0),
+          'weight' => 0,
+        ),
+        array(
+          'name' => 'image_crop',
+          'data' => array('width' => '191', 'height' => '100'),
+          'weight' => 1,
+        ),
+      ),
+    ),
+    'cd_medium_thumb' => array(
+      'label' => 'CD Medium Thumb (220x115)',
+      'effects' => array(
+        array(
+          'name' => 'image_scale_and_crop',
+          'data' => array('width' => '220', 'height' => '115'),
+          'weight' => 0,
+        ),
+      ),
+    ),
+    'cd_large' => array(
+      'label' => 'CD Large (955x500)',
+      'effects' => array(
+        array(
+          'name' => 'image_scale',
+          'data' => array('width' => '955', 'height' => '', 'upscale' => 0),
+          'weight' => 0,
+        ),
+        array(
+          'name' => 'image_crop',
+          'data' => array('width' => '955', 'height' => '500'),
+          'weight' => 1,
+        ),
+      ),
+    ),
+    'cd_special_coverage' => array(
+      'label' => 'CD Special Coverage (370x194)',
+      'effects' => array(
+        array(
+          'name' => 'image_scale',
+          'data' => array('width' => '370', 'height' => '', 'upscale' => 0),
+          'weight' => 0,
+        ),
+        array(
+          'name' => 'image_crop',
+          'data' => array('width' => '370', 'height' => '194'),
+          'weight' => 1,
+        ),
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_token_info().
+ */
+function cdreams_token_info() {
+  $info['tokens']['current-page']['zero-index-page-number'] = array(
+    'name' => t('Zero Index Based Page Number'),
+    'description' => t('Returns the page number in a zero index bases. ie page=0'),
+  );
+  $info['tokens']['current-page']['zero-index-page-number-label'] = array(
+    'name' => t('Zero Index Based Page Number Label'),
+    'description' => t('Returns the page number in a zero index bases. ie Page 0'),
+  );
+  $info['tokens']['current-page']['pager-page-number'] = array(
+    'name' => t('Pager Number'),
+    'description' => t('Returns the numberic page number value'),
+  );
+  $info['tokens']['current-page']['pager-page-number-label'] = array(
+    'name' => t('Pager Number Label'),
+    'description' => t('Returns the page number in the form of a label. ie Page 0'),
+  );
+  $info['tokens']['commondreams']['petition'] = array(
+    'name' => t('Zero Index Based Page Number Label'),
+    'description' => t('Returns the page number in a zero index bases. ie Page 0'),
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function cdreams_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+  if ($type == 'current-page') {
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'zero-index-page-number':
+          if ($page = filter_input(INPUT_GET, 'page')) {
+            // @see PagerDefault::execute()
+            $pager_page_array = explode(',', $page);
+            $page = $pager_page_array[0];
+          }
+          if ($page) {
+            $replacements[$original] = '?page=' . (int) $page;
+          }
+          // Check for $_GET parameters.
+          elseif (isset($_GET['page']) && !empty($_GET['page']) && is_numeric($_GET['page'])) {
+            $replacements[$original] = '?page=' . $_GET['page'];
+          }
+          else {
+            $replacements[$original] = '';
+          }
+          break;
+
+        case 'zero-index-page-number-label':
+          if ($page = filter_input(INPUT_GET, 'page')) {
+            // @see PagerDefault::execute()
+            $pager_page_array = explode(',', $page);
+            $page = $pager_page_array[0];
+          }
+          if ($page) {
+            $replacements[$original] = 'Page ' . (int) $page;
+          }
+          // Check for $_GET parameters.
+          elseif (isset($_GET['page']) && !empty($_GET['page']) && is_numeric($_GET['page'])) {
+            $replacements[$original] = 'Page ' . $_GET['page'];
+          }
+          else {
+            $replacements[$original] = '';
+          }
+          break;
+
+        case 'pager-page-number':
+          if ($page = filter_input(INPUT_GET, 'page')) {
+            // @see PagerDefault::execute()
+            $pager_page_array = explode(',', $page);
+            $page = $pager_page_array[0];
+          }
+          if ($page) {
+            $replacements[$original] = (int) $page + 1;
+          }
+          // Check for $_GET parameters.
+          elseif (isset($_GET['page']) && !empty($_GET['page']) && is_numeric($_GET['page'])) {
+            $replacements[$original] = (int) $_GET['page'] + 1;
+          }
+          else {
+            $replacements[$original] = 1;
+          }
+          break;
+
+        case 'pager-page-number-label':
+          if ($page = filter_input(INPUT_GET, 'page')) {
+            // @see PagerDefault::execute()
+            $pager_page_array = explode(',', $page);
+            $page = (int) $pager_page_array[0] + 1;
+          }
+          if ($page) {
+            $replacements[$original] = 'Page ' . $page;
+          }
+          // Check for $_GET parameters.
+          elseif (isset($_GET['page']) && !empty($_GET['page']) && is_numeric($_GET['page'])) {
+            $replacements[$original] = 'Page ' . ((int) $_GET['page'] + 1);
+          }
+          else {
+            $replacements[$original] = 'Page 1';
+          }
+          break;
+      }
+    }
+  }
+
+  return $replacements;
+}
+
+/**
+ * Alter results of the view execution.
+ *
+ * An example is we can add total number of results as separate value in
+ * response.
+ *
+ * @param array $output
+ *   Results of the view execution. These will be sent to services for
+ *   rendering.
+ * @param object $view
+ *   Views object.
+ */
+function cdreams_services_views_execute_view_alter(array &$output, $view) {
+  if ($view->name == 'api_recent_content') {
+    foreach ($view->result as $key => $data) {
+      $image_url = file_create_url($data->field_field_article_img[0]['raw']['uri']);
+      $output[$key]->field_article_img = $image_url;
+      $output[$key]->field_subtitle = trim(str_replace(['"'], '', strip_tags($data->field_field_subtitle[0]['raw']['value'])));
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function cdreams_preprocess_page(&$variables) {
+  global $conf;
+
+  // Chartbeat, only on DEV.
+  if ($conf['env'] == 'dev') {
+    $tag = [
+      '#weight' => '100',
+      '#type' => 'html_tag',
+      '#tag' => 'script',
+      '#attributes' => [
+        'type' => 'text/javascript',
+      ],
+      '#value' => "
+        var _sf_async_config = _sf_async_config || {};
+        /** CONFIGURATION START **/
+        _sf_async_config.uid = 65712; // ACCOUNT NUMBER
+        _sf_async_config.domain = 'commondreams.org'; // DOMAIN
+        _sf_async_config.flickerControl = false;
+        _sf_async_config.useCanonical = true;
+        /** CONFIGURATION END **/
+        var _sf_startpt = (new Date()).getTime();
+      ",
+    ];
+    drupal_add_html_head($tag, 'chartbeat');
+    drupal_add_js('//static.chartbeat.com/js/chartbeat_mab.js', [
+      'scope' => 'footer',
+      'weight' => '100',
+      'external' => TRUE
+    ]);
+
+    // Variables for the Chart Beat.
+    $variables['chartbeat']['sections'] = '';
+    $variables['chartbeat']['authors'] = '';
+    if (drupal_is_front_page()) {
+      $variables['chartbeat']['sections'] = 'World, War & Peace, Economy, Climate, Rights, Solutions, U.S., Canada';
+      $variables['chartbeat']['authors'] = 'Common Dreams';
+    } elseif ($node = menu_get_object()) {
+      if (isset($node->field_menu_categories)) {
+        $sections = [];
+        foreach ($node->field_menu_categories[LANGUAGE_NONE] as $delta => $value) {
+          $sections[] = $value['taxonomy_term']->name;
+        }
+        $variables['chartbeat']['sections'] = implode(', ', $sections);
+      }
+      if (isset($node->field_hp_author) && !empty($node->field_hp_author)) {
+        $variables['chartbeat']['authors'] = $node->field_hp_author[LANGUAGE_NONE][0]['value'];
+      } elseif (isset($node->field_author_name) && !empty($node->field_author_name)) {
+        $variables['chartbeat']['authors'] = $node->field_author_name[LANGUAGE_NONE][0]['value'];
+      } elseif (isset($node->field_organization) && !empty($node->field_organization)) {
+        $variables['chartbeat']['authors'] = $node->field_organization[LANGUAGE_NONE][0]['entity']->name;
+      }
+    }
+    drupal_add_js("
+      var _sf_async_config = _sf_async_config || {};
+      /** CONFIGURATION START **/
+      _sf_async_config.sections = '" . $variables['chartbeat']['sections'] . "';
+      _sf_async_config.authors = '" . $variables['chartbeat']['authors'] . "';
+      /** CONFIGURATION END **/
+      (function() {
+        function loadChartbeat() {
+          window._sf_endpt = (new Date()).getTime();
+          var e = document.createElement('script');
+          e.setAttribute('language', 'javascript');
+          e.setAttribute('type', 'text/javascript');
+          e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+
+          document.body.appendChild(e);
+        }
+        var oldonload = window.onload;
+        window.onload = (typeof window.onload != 'function') ?
+          loadChartbeat : function() {
+            oldonload();
+            loadChartbeat();
+          };
+
+      })();
+    ", [
+      'type' => 'inline',
+      'scope' => 'footer',
+      'weight' => 5,
+    ]);
+  }
+}
+
+/**
+ * Implements TEMPLATE_preprocess_node().
+ */
+function cdreams_preprocess_node(&$vars, $hook) {
+  $node  = $vars['node'];
+  if ($vars['type'] == 'newswire') {
+    $parts = array();
+
+    if (!empty($vars['content']['body'])) {
+      $body = &$vars['content']['body'][0];
+    }
+    elseif ($vars['content']['wrapper_article_content']['body']) {
+      $body = &$vars['content']['wrapper_article_content']['body'][0];
+    }
+
+    $locations = field_get_items('node', $node, 'field_location');
+    if (!empty($locations)) {
+      $location = reset($locations);
+      $parts[] = check_plain($location['value']);
+    }
+
+    /*
+    $date = field_get_items('node', $node, 'field_article_date');
+    if (!empty($date)) {
+      $parts[] = format_date($date[0]['value'], 'custom', 'F j');
+    }
+     */
+
+    if (!empty($parts) && !empty($body)) {
+      $repl = implode(' - ', $parts);
+
+      $body['#markup'] = preg_replace('#^(<[^>]>|\s)*#', '$1'. $repl .' - ', $body['#markup'])
+        . '<div class="newswire-end">###</div>';
+    }
+  }
+
+  // Remove the statistics count from the node page.
+  unset($vars['content']['links']['statistics']);
+}
+
+/**
+ * Create an edit dialog for in-place editing of nodes.
+ *
+ * @param type $node
+ *  Node to generate a form and edit.
+ * @return array
+ *  Returns a series of AJAX commands.
+ */
+function _cdreams_ajax_node_edit($node) {
+  drupal_page_is_cacheable(FALSE);
+
+  iwapi_include('ajax');
+  module_load_include('inc', 'node', 'node.pages');
+
+  $form_id = "{$node->type}_node_form";
+  $state = array();
+  $form = _iwapi_ajax_get_form($form_id, $state, $node);
+  form_load_include($state, 'inc', 'node', 'node.pages');
+
+  $commands = array();
+  if (!$command = iwapi_ajax_form_complete($state, NULL, TRUE)) {
+    $commands[] = iwapi_ajax_command_dialog(
+      strip_tags(t('Edit @title', array('@title' => $node->title))),
+      array(
+        'messages' => array('#theme' => 'status_messages'),
+        'form' => $form,
+      ),
+      array('width' => 800)
+    );
+  }
+  else {
+    $commands[] = $command;
+
+    $node  = $state['node'];
+    $title = field_get_items('node', $node, 'field_hp_title');
+    $title = empty($title) ? $node->title : $title[0]['value'];
+
+    $imgs  = field_get_items('node', $node, 'field_article_img');
+    $thumb = empty($imgs) ? NULL : image_style_url('thumbnail', $imgs[0]['uri']);
+
+    $commands[] = array(
+      'command'    => 'entity_saved',
+      'entityType' => 'node',
+      'entityId'   => $node->nid,
+      'isNew'      => FALSE,
+      'label'      => check_plain($title),
+      'thumbnail'  => $thumb,
+    );
+
+    theme('status_messages'); // clear status messages.
+  }
+
+  return array('#type' => 'ajax', '#commands' => $commands);
+}
+
+
+// ===========================
+// Menu callbacks
+// ===========================
+
+/**
+ * Render the page filtering by a specific date.
+ *
+ * @param type $prefix
+ *  The prefix which defines which content type.
+ * @param type $year
+ *  Year to retrieve the date for.
+ * @param type $month
+ *  Month to retrieve the date.
+ * @return array | int
+ *  Renderable page content if parameters are correct.
+ *  If view is missing or parameters are incorrect, return
+ *  MENU_NOT_FOUND.
+ */
+function _cdreams_article_archive_page($prefix, $year, $month) {
+  $date  = "$year$month";
+  $label = "$year-$month";
+  $prefixes = _cdreams_get_article_prefixes();
+
+  $arg = arg(3);
+  if (!empty($arg)) {
+    $parts = explode('-', $arg);
+    $date .= $parts[0];
+    $label .= '-'. $parts[0];
+  }
+
+  $info    = $prefixes[$prefix];
+  $view    = views_get_view($info['view']);
+  $variant = 'article_display_page';
+
+  if ($view && $view->access($variant)) {
+    // Generate the content view.
+    $page['view_content'] = array(
+      '#markup' => $view->preview($variant, array($date))
+    );
+
+    drupal_set_title($view->get_title() .' for '. $label);
+  }
+  else {
+    return MENU_NOT_FOUND;
+  }
+
+  return $page;
+}
+
+
+// ===============================
+// Helper / utility functions
+// ===============================
+
+/**
+ * Retrieve settings for how to display date restricted pages.
+ *
+ * @return array
+ *  Map between article prefix name, and the
+ *  content type + view to use to generate
+ *  date filtered items.
+ */
+function _cdreams_get_article_prefixes() {
+  return array(
+    'news' => array(
+      'type' => 'headline',
+      'view' => 'news',
+    ),
+    'views' => array(
+      'type' => 'views_article',
+      'view' => 'views_articles',
+    ),
+    'further' => array(
+      'type' => 'further',
+      'view' => 'further',
+    ),
+    'newswire' => array(
+      'type' => 'newswire',
+      'view' => 'newswire',
+    ),
+  );
+}
+
+/**
+ * Generate a value that can be used for
+ * the home page title field.
+ *
+ * @param object $entity
+ *  The entity to extract the label / title from.
+ * @param string $type
+ *  Machine name of the type of entity being worked on.
+ * @return array
+ *  Array that can be used as the value of the homepage field.
+ */
+function _cdreams_default_hp_title_value($entity, $type) {
+  return array(
+    array('value' => entity_label($type, $entity)),
+  );
+}
+
+/**
+ * Generate an author field that can be used to display
+ * on the homepage as the author of the article.
+ *
+ * @param object $entity
+ *  The entity to extract the label / title from.
+ * @param string $type
+ *  Machine name of the type of entity being worked on.
+ * @return array
+ *  Array that can be used as the value of the homepage field.
+ */
+function _cdreams_default_hp_author_value($entity, $type) {
+  $values = array();
+
+  // Find the author profile titles, and add them to the HP naming.
+  if ($items = field_get_items($type, $entity, 'field_author_profile')) {
+    if ($field = field_info_field('field_author_profile')) {
+
+      switch ($field['type']) {
+        case 'entityreference':
+          $idKey      = 'target_id';
+          $entityType = $field['settings']['target_type'];
+          break;
+        case 'node_reference':
+        default:
+          $idKey      = 'nid';
+          $entityType = 'node';
+      }
+
+      array_walk($items, '_iwapi_extract_array_field', $idKey);
+      foreach (entity_load($entityType, $items) as $row) {
+        $values[] = entity_label($entityType, $row);
+      }
+    }
+  }
+
+  // Author names are just a text value, and can be appended.
+  if ($items = field_get_items($type, $entity, 'field_author_name')) {
+    foreach ($items as $item) {
+      if (isset($item['value']) && is_string($item['value'])) {
+        $values[] = $item['value'];
+      }
+    }
+  }
+
+  // Return the first 2 values.
+  if (!empty($values)) {
+    return array(
+      array('value' => implode(', ', array_splice($values, 0, 2))),
+    );
+  }
+
+  return NULL;
+}
+
+/**
+ * Fetch the time to live for ordering data.
+ */
+function _cdreams_get_ordering_ttl() {
+  return (int)variable_get(CDREAMS_VAR_ORDERING_DATA_TTL, 7*24*3600);
+}
+
+/**
+ * Extract the information regarding default
+ * content sorting, and save it the database.
+ *
+ * @param stdClass $node
+ *  Node being checked, and adding it's data.
+ */
+function _cdreams_save_node_ordering(stdClass $node) {
+  $date = field_get_items('node', $node, 'field_article_date');
+
+  // Default to created date if no article date found.
+  if (empty($date[0]['value'])) {
+    $date[0]['value'] = $node->created;
+  }
+
+  if (!is_int($date[0]['value'])) {
+    $date[0]['value'] = preg_match('#^\d+$#', $date[0]['value'])
+      ? intval($date[0]['value']) : strtotime($date[0]['value']);
+  }
+
+  $keys = array('entity_type' => 'node', 'entity_id' => $node->nid);
+  $data = $keys + array(
+    'date' => floor($date[0]['value'] / (24*3600)) * 24*3600, // TRUNCATE to Day
+    'created' => $node->created,
+    'rev' => $node->vid,
+  );
+
+  $ttl = _cdreams_get_ordering_ttl();
+  if ((REQUEST_TIME - $ttl) <= $data['date']) {
+    db_merge('cdreams_ordering')
+      ->key($keys)
+      ->updateFields($data)
+      ->insertFields($data + array('weight' => 0))
+      ->execute();
+  }
+}
+
+
+// ==========================
+// Filter callbacks
+// ==========================
+
+/**
+ * Find links and image links which are using certain
+ * Common Dreams domain names and alter them so that we
+ * always use the canonical URL.
+ *
+ * @param string $text
+ *  The text string to be filtered.
+ * @param object $filter
+ *  The filter object containing settings for the given format.
+ * @param string $format
+ *  The text format object assigned to the text to be filtered.
+ * @param string $langcode
+ *  The language code of the text to be filtered.
+ * @param bool $cache
+ *  A Boolean indicating whether the filtered text is going to be cached in {cache_filter}.
+ * @param string $cache_id
+ *  The ID of the filtered text in {cache_filter}, if $cache is TRUE.
+ * @return string
+ *  The text which has been filtered.
+ */
+function _cdreams_domain_filter($text, $filter, $format, $langcode, $cache, $cache_id) {
+  $settings = variable_get(CDREAMS_VAR_DOMAIN_FILTER, array()) + array(
+    'domains' => array('admin.commondreams.org'),
+    'alter_to' => CDREAMS_DOMAIN_CANONICAL, // by default, change domains to the canonical URL.
+  );
+
+  if (empty($settings['domains'])) {
+    return $text; // Don't filter anything
+  }
+
+  return preg_replace_callback('#(<(?:img|a|form)[^>]* (?:src|action|href)=["\'])([^""\']+)#im', '_cdreams_domain_filter_callback', $text);
+}
+
+
+function _cdreams_domain_filter_callback($matches) {
+  static $domain;
+  static $pattern;
+
+  if (!isset($domain) || !isset($pattern)) {
+    $settings = variable_get(CDREAMS_VAR_DOMAIN_FILTER, array()) + array(
+      'domains' => array('admin.commondreams.org'),
+      'alter_to' => CDREAMS_DOMAIN_CANONICAL, // by default, change domains to the canonical URL.
+    );
+
+    switch ($settings['alter_to']) {
+      case CDREAMS_DOMAIN_CANONICAL:
+        if (module_exists('metatag')) {
+          $meta = metatag_config_load_with_defaults("global");
+          $canonical = metatag_get_instance('canonical', $meta['canonical'])->getValue();
+
+          $uri_parts = parse_url($canonical);
+          if (!empty($uri_parts['host'])) {
+            $domain = $uri_parts['host'];
+            break;
+          }
+        }
+
+      case CDREAMS_DOMAIN_CURRENT: // use the current host information to build the link.
+        global $base_insecure_url;
+
+        $uri_parts = parse_url($base_insecure_url);
+        $domain = $uri_parts['host'];
+        break;
+    }
+
+    $pattern = '#((?:https?:)?//)'. implode('|', $settings['domains']) .'([:/])#';
+  }
+
+  return $matches[1] .preg_replace($pattern, '$1'. $domain .'$2', $matches[2]);
+}
+
+/**
+ * Generate tool tip text for the Common Dreams domain filter.
+ *
+ * @param object $filter
+ *  An object representing the filter.
+ * @param string $format
+ *  An object representing the text format the filter is contained in.
+ * @param bool $long
+ *  Whether this callback should return a short tip to display in a
+ *  form (FALSE), or whether a more elaborate filter tips should be
+ *  returned for theme_filter_tips() (TRUE).
+ * @return string
+ *  A string with tool tip to help users with this filter.
+ */
+function _cdreams_domain_filter_tips($filter, $format, $long) {
+  if ($long) {
+    return t('Lines and paragraphs are automatically recognized. The &lt;br /&gt; line break, &lt;p&gt; paragraph and &lt;/p&gt; close paragraph tags are inserted automatically. If paragraphs are not recognized simply add a couple blank lines.');
+  }
+  else {
+    return t('Lines and paragraphs break automatically.');
+  }
+}

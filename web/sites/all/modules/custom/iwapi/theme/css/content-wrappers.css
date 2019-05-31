@@ -1,0 +1,117 @@
+
+/* Column styles
+----------------------------*/
+.content-column {
+  float: left;
+  clear: none;
+  padding: 0;
+  margin: 0;
+}
+
+.content-column.align-right	{ float: right; }
+.content-column > .inner-column { 
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}
+
+.content-column.alpha > .inner-column { margin-left: 0; }
+.content-column.omega > .inner-column { margin-right: 0; }
+
+
+/* Container prompt styles
+----------------------------*/
+.content-container .content-prompt {
+  margin-bottom: 1em;
+  font-size: 0.875em;
+  border-radius: 5px;
+}
+
+.content-container .content-prompt.bolded {
+  color: #444;
+  font-weight: bold;
+}
+
+.content-container .content-prompt.italized {
+  font-style: italic;
+}
+
+
+/* Inline field handling
+ ----------------------------- */
+.field-wrapper.inline-fields > *,
+.field-wrapper .inner-column.inline-fields > * {
+  display: -moz-inline-stack;
+  display: inline-block;
+  *display: inline;
+  vertical-align: middle;
+  *vertical-align: auto;
+  zoom: 1;
+}
+
+.field-wrapper.inline-fields > div.grouping-prefix,
+.field-wrapper.inline-fields > div.grouping-suffix,
+.field-wrapper.inline-fields > div.grouping-spacer,
+.field-wrapper .inner-column.inline-fields > div.grouping-prefix,
+.field-wrapper .inner-column.inline-fields > div.grouping-suffix,
+.field-wrapper .inner-column.inline-fields > div.grouping-spacer {
+  margin: 0 0.5em;
+}
+
+
+/* Flexible grid styles
+----------------------------*/
+
+.grid-size-12 .span-1  { width: 8.3333333%; }
+.grid-size-12 .span-2  { width: 16.666666%; }
+.grid-size-12 .span-3  { width: 25%; }
+.grid-size-12 .span-4  { width: 33.333333%; }
+.grid-size-12 .span-5  { width: 41.666666%; }
+.grid-size-12 .span-6  { width: 50%; }
+.grid-size-12 .span-7  { width: 58.333333%; }
+.grid-size-12 .span-8  { width: 66.666666%; }
+.grid-size-12 .span-9  { width: 75%; }
+.grid-size-12 .span-10 { width: 83.33333%; }
+.grid-size-12 .span-11 { width: 91.66666%; }
+.grid-size-12 .span-12 { width: 100%; }
+
+.grid-size-16 .span-1  { width: 6.25%; }
+.grid-size-16 .span-2  { width: 12.5%; }
+.grid-size-16 .span-3  { width: 18.75%; }
+.grid-size-16 .span-4  { width: 25%; }
+.grid-size-16 .span-5  { width: 31.25%; }
+.grid-size-16 .span-6  { width: 37.5%; }
+.grid-size-16 .span-7  { width: 43.75%; }
+.grid-size-16 .span-8  { width: 50%; }
+.grid-size-16 .span-9  { width: 56.25%; }
+.grid-size-16 .span-10 { width: 62.5%; }
+.grid-size-16 .span-11 { width: 68.75%; }
+.grid-size-16 .span-12 { width: 75% }
+.grid-size-16 .span-13 { width: 81.25%; }
+.grid-size-16 .span-14 { width: 87.5%; }
+.grid-size-16 .span-15 { width: 93.75%; }
+.grid-size-16 .span-16 { width: 100%; }
+
+.grid-size-24 .span-1  { width: 4.1666666%; }
+.grid-size-24 .span-2  { width: 8.3333333%; }
+.grid-size-24 .span-3  { width: 12.5%; }
+.grid-size-24 .span-4  { width: 16.666666%; }
+.grid-size-24 .span-5  { width: 20.833333%; }
+.grid-size-24 .span-6  { width: 25%; }
+.grid-size-24 .span-7  { width: 29.166666%; }
+.grid-size-24 .span-8  { width: 33.333333%; }
+.grid-size-24 .span-9  { width: 37.5%; }
+.grid-size-24 .span-10 { width: 41.666666%; }
+.grid-size-24 .span-11 { width: 45.833333%; }
+.grid-size-24 .span-12 { width: 50%; }
+.grid-size-24 .span-13 { width: 54.166666%;}
+.grid-size-24 .span-14 { width: 58.333333%; }
+.grid-size-24 .span-15 { width: 62.5%; }
+.grid-size-24 .span-16 { width: 66.666666%; }
+.grid-size-24 .span-17 { width: 70.833333%; }
+.grid-size-24 .span-18 { width: 75%;}
+.grid-size-24 .span-19 { width: 79.166666%; }
+.grid-size-24 .span-20 { width: 83.333333%; }
+.grid-size-24 .span-21 { width: 87.5%; }
+.grid-size-24 .span-22 { width: 91.666666%; }
+.grid-size-24 .span-23 { width: 95.833333%; }
+.grid-size-24 .span-24 { width: 100%; }

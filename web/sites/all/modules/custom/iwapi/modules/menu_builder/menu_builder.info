@@ -1,0 +1,24 @@
+;
+; Create by Liem Khuu 2011 @ Image Works
+; ==========================================
+
+name = Menu Builder
+package = Image Works Utilities
+description = Handle extending the menu in various ways, and provides hooks to extend further.
+
+core = 7.x
+version = 7.x-0.9-dev
+php = 5.2
+
+dependencies[] = iwapi
+
+; Core module files
+; ==========================================
+files[] = menu_options.module
+files[] = class/MenuBuilderMenu.inc
+
+
+; Menu builder styles
+; ==========================================
+files[] = class/MenuBuilderStyle.inc
+files[] = class/ColumnsMenuStyle.inc

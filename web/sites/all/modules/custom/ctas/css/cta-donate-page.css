@@ -1,0 +1,170 @@
+/*
+ * Globals
+ */
+
+/* Links */
+a,
+a:focus,
+a:hover {
+  color: #fff;
+}
+
+/* Custom default button */
+.btn-secondary,
+.btn-secondary:hover,
+.btn-secondary:focus {
+  color: #333;
+  text-shadow: none; /* Prevent inheritance from `body` */
+  background-color: #fff;
+  border: .05rem solid #fff;
+}
+
+
+/*
+ * Base structure
+ */
+
+html,
+body {
+  height: 100%;
+  background-color: #333;
+}
+
+body {
+  color: #fff;
+}
+h1 {
+  display: none;
+}
+.cover-container {
+  max-width: 560px;
+}
+
+
+/*
+ * Header
+ */
+.masthead {
+  margin-bottom: 2rem;
+}
+
+.masthead-brand {
+  margin-bottom: 0;
+}
+.nav.nav-masthead {
+  display: none;
+}
+.nav-masthead .nav-link {
+  padding: .25rem 0;
+  font-weight: 700;
+  color: rgba(255, 255, 255, .5);
+  background-color: transparent;
+  border-bottom: .25rem solid transparent;
+}
+
+.nav-masthead .nav-link:hover,
+.nav-masthead .nav-link:focus {
+  border-bottom-color: rgba(255, 255, 255, .25);
+}
+
+.nav-masthead .nav-link + .nav-link {
+  margin-left: 1rem;
+}
+
+.nav-masthead .active {
+  color: #fff;
+  border-bottom-color: #fff;
+}
+
+@media (min-width: 48em) {
+  h1 {
+    display: block;
+  }
+  .masthead-brand {
+    float: left;
+  }
+  .nav.nav-masthead {
+    display: flex;
+    float: right;
+  }
+}
+
+
+/*
+ * Cover
+ */
+.cover {
+  padding: 0 1.5rem;
+}
+.cover .btn-lg {
+  padding: .75rem 1.25rem;
+  font-weight: 700;
+}
+
+
+/*
+ * Footer
+ */
+.mastfoot {
+  color: rgba(255, 255, 255, .5);
+}
+
+
+/**
+ * Page Content
+ */
+#cta-donate-page #hero {
+  /*background: url("/sites/all/themes/omega_dreams/images/population-hero.jpg") no-repeat;*/
+  /*background-size: cover;*/
+  background: rgb(29,32,66);
+  background: linear-gradient(0deg, rgba(29,32,66,1) 0%, rgba(29,32,66,1) 37%, rgba(38,46,131,1) 100%);
+}
+#cta-donate-page #hero .container {
+  max-width: 560px;
+}
+#extra-content {
+  background: white;
+}
+#cta-donate-page main .form {
+  flex: 1;
+}
+.donation-options .btn {
+  flex: 1;
+  text-align: center;
+}
+#share-action-wrapper {
+  background: #113b63;
+  color: white;
+  min-height: 600px;
+}
+#share-action-wrapper .share-title span {
+  font-size: 100px;
+  padding: 0 20px;
+}
+#share-action-wrapper .share-title .fa {
+  font-size: 100px;
+}
+#share-action-wrapper .share-buttons .btn {
+  font-size: 36px;
+  color: white;
+}
+#share-action-wrapper h2  {
+  font-size: 72px;
+}
+#share-action-wrapper .fb-share-button,
+#share-action-wrapper .twitter-share-button-wrapper {
+  margin: 0 12px;
+}
+#share-action-wrapper .fb-share-button button {
+  height: 50px;
+}
+
+@media (min-width: 400px) {
+  .suggested-amounts .d-sm-block {
+    display: block!important;
+  }
+  #other-amount {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+}

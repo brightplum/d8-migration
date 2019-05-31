@@ -1,0 +1,22 @@
+;
+; Developed: Image Works (http://www.imagewks.com)
+;
+; Author(s): Liem Khuu   (liem@imagewks.com)
+; ==========================================
+
+name = Entity Notes
+package = Image Works Utilities
+description = Provides commenting for some supported entities.
+
+core = 7.x
+version = 7.x-1.0
+
+dependencies[] = iwapi
+
+
+; Class includes
+; ==========================================
+files[] = lib/NoteEntity.inc
+
+
+files[] = views/entity_note_views_handler_filter_type.inc
