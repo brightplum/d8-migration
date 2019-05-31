@@ -1,0 +1,103 @@
+;
+; Developer: Image Works (http://www.imagewks.com)
+;
+; Author(s): Liem Khuu   (liem@imagewks.com)
+;            Neil Arnold (neil@imagewks.com)
+; ==========================================
+
+name = Image Works API
+package = Image Works Utilities
+description = Provide a suite of utilities for custom website functionality.
+
+php = 5.3
+core = 7.x
+version = 7.x-1.5
+
+configure = admin/config/system/iwapi-utils
+
+dependencies[] = file
+
+
+; Core classes
+; ==================================
+files[] = lib/core/mutex.inc
+files[] = lib/core/exception.inc
+files[] = lib/core/packaging.inc
+files[] = lib/core/storage.inc
+files[] = lib/core/stash.inc
+
+
+; Packaged Utilities
+; ==================================
+files[] = lib/packages/iwDataImport.inc
+
+; Data mapping
+files[] = lib/mappers/iwMapper.inc
+files[] = lib/mappers/iwDateMapper.inc
+files[] = lib/mappers/iwNestedMapper.inc
+files[] = lib/mappers/iwDatabaseMapper.inc
+files[] = lib/mappers/iwDelimitedMapper.inc
+files[] = lib/mappers/iwTextReplaceMapper.inc
+files[] = lib/mappers/iwEntityUriMapper.inc
+files[] = lib/mappers/iwTaxonomyMapper.inc
+
+; Readers
+files[] = lib/readers/iwArrayReader.inc
+files[] = lib/readers/iwCSVReader.inc
+files[] = lib/readers/iwZipReader.inc
+files[] = lib/readers/iwDbReader.inc
+
+; Writers
+files[] = lib/writers/iwDatabaseWriter.inc
+files[] = lib/writers/iwNodeWriter.inc
+files[] = lib/writers/iwUserWriter.inc
+files[] = lib/writers/SystemWriter.inc
+files[] = lib/writers/iwManagedFileWriter.inc
+files[] = lib/writers/iwTaxonomyWriter.inc
+files[] = lib/writers/iwRedirectWriter.inc
+
+; Entity attachers
+files[] = lib/entity/iwEntityAttacher.inc
+files[] = lib/entity/iwFieldAttacher.inc
+files[] = lib/entity/iwFieldExtraAttacher.inc
+files[] = lib/entity/iwFieldGroupAttacher.inc
+
+files[] = lib/fields/iwFieldHandlers.inc
+
+
+; Entity classes
+; ==================================
+files[] = lib/entity/iwEntity.inc
+files[] = lib/entity/iwEntityController.inc
+files[] = lib/entity/iwEntityProperty.inc
+
+files[] = lib/fields/iwFieldRenderer.inc
+
+
+; Views
+; ==================================
+files[] = views/iwapi_views_plugin_row_entity.inc
+
+files[] = views/iwapi_views_handler_field_entity.inc
+files[] = views/iwapi_views_handler_argument_entity_id.inc
+files[] = views/iwapi_views_handler_filter_entity_bundle.inc
+
+files[] = views/iwapi_views_join_revisioned_entity.inc
+
+
+; Content Wrappers
+; ==================================
+files[] = lib/wrappers/iwContentWrapper.inc
+files[] = lib/wrappers/iwPromptWrapper.inc
+files[] = lib/wrappers/iwFieldsetWrapper.inc
+
+
+; Content Embeds
+; ==================================
+files[] = lib/embeds/iwEmbedContent.inc
+
+
+; Tests
+; ==================================
+files[] = tests/import/user_import.test
+;files[] = tests/import/node_import.test

@@ -1,0 +1,10 @@
+name = Common Dreams Apple News
+package = Apple News
+description = Custom Apple News module with a styled node export.
+core = 7.x
+
+files[] = include/export.inc
+files[] = include/destination.inc
+
+dependencies[] = applenews
+

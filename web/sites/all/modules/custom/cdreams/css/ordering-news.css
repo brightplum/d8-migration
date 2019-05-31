@@ -1,0 +1,33 @@
+
+#content-canvas .grid-tile {
+  float: left;
+  padding-top: 14px;
+  margin: 0.5% 0.5%;
+  width: 24%;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+
+/* Special content coloring.
+ ---------------------------*/
+
+#content-canvas #slot-0,
+#content-canvas #slot-1 {
+  background: #88f;
+  width: 99%;
+}
+
+#content-canvas #slot-2,
+#content-canvas #slot-3 {
+  background: #88f;
+  width: 49%;
+}
+
+
+#slot-0 .content-container,
+#slot-1 .content-container,
+#slot-2 .content-container,
+#slot-3 .content-container {
+  border-color: #338;
+}

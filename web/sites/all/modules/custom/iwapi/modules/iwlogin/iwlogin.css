@@ -1,0 +1,75 @@
+
+body.page-iwlogin-iframe { background: transparent; }
+body.page-iwlogin-iframe .policy-agreement { height: 12em; }
+
+#iwlogin-container .form-item { position: relative; }
+
+#iwlogin-container label {
+  display: block;
+  position: absolute;
+  top: 4px;
+  left: 0px;
+  color: #333;
+  width: 100px;
+  font-size: 14px;
+}
+
+#iwlogin-container .form-type-checkbox label {
+  position: static;
+  display: inline;
+  width: auto;
+}
+
+#iwlogin-container input.form-submit { margin-left: 115px; }
+#iwlogin-container .policy-actions input.form-submit { margin-left: 0; }
+
+#iwlogin-container ul,
+#iwlogin-container .description,
+#iwlogin-container input.form-text {
+  display: block;
+  width: 400px;
+  margin-left: 115px;
+}
+
+
+#iwlogin-container .modal-content input.form-submit { margin-left: 105px; }
+
+#iwlogin-container .modal-content ul,
+#iwlogin-container .modal-content .description,
+#iwlogin-container .modal-content input.form-text {
+  display: block;
+  width: 300px;
+  margin-left: 105px;
+}
+
+#iwlogin-container ul {
+  margin-top: 1.5em;
+  margin-bottom: 1em;
+  padding: 0;
+}
+
+#iwlogin-container .user-login li { margin: 0.375em 0; }
+
+
+/* Additional login versions
+--------------------------------- */
+#iwlogin-container .alternative-login {
+  display: block;
+  color: #3f583a;
+  border: 2px solid #7d9b77;
+  width: 100%;
+  margin-bottom: 1em;
+  font-size: 11px;
+}
+
+#iwlogin-container .alternative-login .inner {
+  background: #d8efd3;
+  margin: 2px;
+  padding: 8px 12px;
+}
+
+div.large-progress-icon {
+  background: transparent url('images/ajax-loader.gif') no-repeat scroll center center;
+  min-height: 200px;
+  min-width: 60px;
+}

@@ -1,0 +1,384 @@
+<?php
+/**
+ * @file iwsearch.install
+ * Installation and update functionality.
+ */
+
+
+// ==============================
+// Drupal installation HOOKs
+// ==============================
+
+/**
+ * Implements HOOK_uninstall().
+ */
+function iwsearch_uninstall() {
+  $instance_names = db_select('iwsearch_instances', 'inst')
+    ->fields('inst', array('name'))
+    ->condition('local_index', 1)
+    ->execute()->fetchCol();
+  
+  // Find search instances with local tables and delete it.
+  foreach ($instance_names as $name) {
+    $instance = iwsearch_instance_load($name);
+    if ($instance instanceof iwIndexedSearchProvider) {
+      db_drop_table($instance->getIndexName());
+    }
+  }
+
+  // Delete all the variable relating to this module.
+  $varnames = db_select('variable', 'var')
+    ->fields('var', array('name'))
+    ->condition('name', 'iwsearch_%', 'LIKE')
+    ->execute()->fetchCol();
+  
+  foreach ($varnames as $var) {
+    variable_del($var);
+  }
+  
+  // Empty the entire iwSearch stash.
+  include_once 'lib/core.inc';
+  
+  $stash = new iwSearchStashController();
+  $stash->clear();
+}
+
+/**
+ * Implements HOOK_schema().
+ */
+function iwsearch_schema() {
+  // Providers of the search, which control how a search is run.
+  $schema['iwsearch_instances'] = array(
+    'description' => 'Table which contains information about Search configurations',
+    'fields' => array(
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'description' => 'Machine name identifier for this instance.',
+      ),
+      'label' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'User friendly name of the instance',
+      ),
+      'provider' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'Class name of the search provider handler.',
+      ),
+      'local_index' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Does this search use a local index table?',
+      ),
+      'last_indexed' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'data' => array(
+        'type' => 'blob',
+        'size' => 'normal',
+        'serialize' => TRUE,
+        'description' => 'Serialized search configuration information about how to handle the fields.',
+      ),
+    ),
+    'primary key' => array('name'),
+    'index keys'  => array('indexed' => array('local_index', 'last_indexed')),
+  );
+  
+  // Track and control search results pages.
+  $schema['iwsearch_results'] = array(
+    'description' => 'Configurations for search results',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'uri' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'The path of the results page.',
+      ),
+      'name' => $schema['iwsearch_instances']['fields']['name'],
+      'title' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'Title to display on the search page.',
+      ),
+      'label' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'Internal label to refer to this result as.',
+      ),
+      'handler' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'Class name of the search results handler.',
+      ),
+      'has_ajax' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Does this search support ajax requests?',
+      ),
+      'has_block' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Generate a block for this search page.',
+      ),
+      'data' => array(
+        'type' => 'blob',
+        'size' => 'normal',
+        'serialize' => TRUE,
+        'description' => 'Serialized sort and display settings.',
+      ),
+    ),
+    'primary key' => array('id'),
+    'unique keys' => array('uri' => array('uri')),
+    'index keys'  => array('provider' => array('name')),
+    'foreign keys' => array(
+      'search_instance' => array(
+        'table' => 'iwsearch_instances',
+        'columns' => array('name' => 'name'),
+      ),
+    ),
+  );
+  
+  return $schema;
+}
+
+// ============================
+// Update functionality
+// ============================
+
+/**
+ * Convert search elements from an older format
+ * into the newer class types.
+ * 
+ * Mainly applies to the iwSearchCheckboxes, iwSearchSelect,
+ * and the iwSearchTermCheckboxes.
+ */
+function iwsearch_update_7101() {
+  registry_update(); // ensure that required class is indexed and loaded.
+    
+  $repl_fields = array();
+  $alter['iwSearchSelect'] = array(
+    'formType' => 'select',
+    'multi'    => FALSE,
+  );
+  
+  // preg parameters.
+  $patt = '#s:\d+:"([^"]+)";C:\d+:"('. implode('|', array_keys($alter)) .')":#';
+  $repl_pats = array(
+    '#C:\d+:"(iwSearchCheckboxes|iwSearchSelect)":#',
+    '#C:\d+:"(iwSearchTermCheckboxes)":#',
+  );
+  $repl_subs = array(
+    'C:19:"iwSearchAllowedList":',
+    'C:12:"iwSearchTerm":',
+  );
+  
+  $rs = db_select('iwsearch_instances', 'inst')
+    ->fields('inst')
+    ->execute();
+  
+  // Go through all existing search provider instances and alter changed fields.
+  while ($entry = $rs->fetchAssoc()) {
+    try {
+      if (preg_match_all($patt, $entry['data'], $matches, PREG_SET_ORDER)) {
+        foreach ($matches as $match) {
+          $repl_fields[$match[1]] = $match[2];
+        }
+      }
+
+      // Fix and repair
+      $entry['data'] = preg_replace($repl_pats, $repl_subs, $entry['data']);
+      $provider = iwSearchProvider::BuildProvider($entry);
+      
+      foreach ($repl_fields as $fieldname => $type) {
+        foreach ($alter[$type] as $prop => $value) {
+          $provider->elements[$fieldname]->{$prop} = $value;
+        }
+      }
+
+      $provider->save();
+    }
+    catch (Exception $e) {
+      $msg = '%type-%name: !message in %function (line %line of %file).';
+      watchdog_exception('iwsearch', $e, $msg, array('%name' => $entry['name']));
+    }
+  }
+  
+  return t('Search fields have been updated to use new types.');
+}
+
+/**
+ * Alter the field element property $solrKey into $indexKey to be
+ * more generic. Solr will hopefully not be the only search type.
+ */
+function iwsearch_update_7102() {
+  $rs = db_select('iwsearch_instances', 'inst')
+    ->fields('inst')
+    ->execute();
+  
+  // Go through all existing search provider instances and alter changed fields.
+  while ($entry = $rs->fetchAssoc()) {
+    try {
+      $provider   = iwSearchProvider::BuildProvider($entry);
+      $field_info = $provider->getAvailFilters();
+      
+      foreach ($provider->elements as $fieldname => $element) {
+        if (isset($field_info[$fieldname])) {
+          $data      = $element->packData() + $field_info[$fieldname];
+          $elemClass = get_class($element);
+          
+          // Remake the search element with the new provider information.
+          $provider->elements[$fieldname] = new $elemClass($data);
+        }
+      }
+
+      $provider->save(); // Save the updated provider information.
+    }
+    catch (Exception $e) {
+      $msg = '%type-%name: !message in %function (line %line of %file).';
+      watchdog_exception('iwsearch', $e, $msg, array('%name' => $entry['name']));
+    }
+  }
+  
+  return t('Search fields have been updated to use $indexKey instead of $solrKey');
+}
+
+/**
+ * Move results configurations and information into a
+ * separate database table.
+ */
+function iwsearch_update_7103() {
+  require_once __DIR__ .'/iwsearch.module';
+  
+  if (!db_table_exists('iwsearch_results')) {
+    // Add the new results table.
+    $table = array(
+      'description' => 'Configurations for search results',
+      'fields' => array(
+        'id' => array(
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'uri' => array(
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'description' => 'The path of the results page.',
+        ),
+        'name' => array(
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => TRUE,
+          'description' => 'Machine name identifier for this instance.',
+        ),
+        'title' => array(
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'description' => 'Title to display on the search page.',
+        ),
+        'label' => array(
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'description' => 'Internal label to refer to this result as.',
+        ),
+        'handler' => array(
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'description' => 'Class name of the search results handler.',
+        ),
+        'has_ajax' => array(
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => TRUE,
+          'default' => 0,
+          'description' => 'Does this search support ajax requests?',
+        ),
+        'data' => array(
+          'type' => 'blob',
+          'size' => 'normal',
+          'serialize' => TRUE,
+          'description' => 'Serialized sort and display settings.',
+        ),
+      ),
+      'primary key' => array('id'),
+      'unique keys' => array('uri' => array('uri')),
+      'index keys'  => array('provider' => array('name')),
+      'foreign keys' => array(
+        'search_instance' => array(
+          'table' => 'iwsearch_instances',
+          'columns' => array('name' => 'name'),
+        ),
+      ),
+    );
+    db_create_table('iwsearch_results', $table);
+  }
+  
+  // Probably not generally a good way to handle this but
+  // the code that has this is expecting this column, and
+  // we need to make sure it is there.
+  iwsearch_update_7104();
+  
+  if (db_field_exists('iwsearch_instances', 'uri')) {
+    // Check all current search instances, and fix the results handlers settings.
+    $query = db_select('iwsearch_instances', 'inst')
+      ->fields('inst', array('name', 'uri', 'data'))
+      ->condition('uri', '', '<>');
+  
+    foreach ($query->execute() as $inst) {
+      $provider = _iwsearch_instance_load_unchanged($inst->name);
+      $data     = unserialize($inst->data);
+
+      if (is_array($data) && isset($data['results']['handler'])) {
+        $data['results']['uri'] = $inst->uri;
+        $data['results']['label'] = $provider->label;
+        $data['results']['title'] = $provider->label;
+      
+        $resultClass = $data['results']['handler'];
+        $results = new $resultClass($provider, $data['results']);
+        $results->save();
+      }
+    }
+  
+    db_drop_field('iwsearch_instances', 'uri');
+    db_add_index('iwsearch_instances', 'indexed', array('local_index', 'last_indexed'));
+  }
+}
+
+/**
+ * Add a column to indicate if a results page should
+ * generate a complementary search block.
+ */
+function iwsearch_update_7104() {
+  if (!db_field_exists('iwsearch_results', 'has_block')) {
+    db_add_field('iwsearch_results', 'has_block', array(
+      'type' => 'int',
+      'size' => 'tiny',
+      'not null' => TRUE,
+      'default' => 0,
+      'description' => 'Generate a block for this search page.',
+    ));
+  }
+}

@@ -1,0 +1,494 @@
+<?php
+/**
+ * @file menu_options.module
+ * The core drupal HOOKs and functionality for the menu_options
+ */
+
+// Variable contains a list of menus that can be rendered
+// using the menu builder system.
+define('MENU_BUILDER_VAR_MENUS', 'menu_builder_menus');
+
+
+// ============================
+// Drupal HOOKs
+// ============================
+
+/**
+ * Implements HOOK_menu()
+ */
+function menu_builder_menu() {  
+  return array(
+    'admin/structure/menu/manage/%menu_builder_menu/menu-builder' => array(
+      'type' => MENU_LOCAL_TASK,
+      'title' => 'Menu Builder',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('menu_builder_build_form', 4),
+      'access arguments' => array('administer menu'),
+      'file' => 'menu_builder.admin.inc',
+    ),
+  );
+}
+
+/**
+ * Implements HOOK_block_info().
+ */
+function menu_builder_block_info() {
+  $blocks = array();
+  $menu_names = menu_get_menus();
+
+  // Create a block for each of the menu types that have menu builder settings.
+  // Make sure all these menu names are still valid. According to menu_block_info()
+  // we should not make an attempt to cache the menus here.
+  foreach (variable_get(MENU_BUILDER_VAR_MENUS, array()) as $name => $info) {
+    if (array_key_exists($name, $menu_names) && !empty($info['enabled'])) {
+      $blocks[$name] = array(
+        'info' => t('Menu builder: @menu', array('@menu' => $menu_names[$name])),
+        'cache' => DRUPAL_NO_CACHE,
+      );
+    }
+  }
+  return $blocks;
+}
+
+/**
+ * Implements HOOK_block_view().
+ */
+function menu_builder_block_view($delta) {
+  $builder = new MenuBuilderMenu($delta);
+  return array('content' => $builder->render());
+}
+
+/**
+ * Implements HOOK_menu_link_alter().
+ */
+function menu_builder_menu_link_alter(&$item) {
+  // Clean out our menu builder properties before the link is saved.
+  if (!empty($item['options']['icon']) && is_array($item['options']['icon'])) {
+     $item['options']['icon'] = array_filter($item['options']['icon']);
+  }
+  if (!empty($item['options']['attributes']) && is_array($item['options']['attributes'])) {
+    $item['options']['attributes'] = array_filter($item['options']['attributes']);
+  }
+}
+
+/**
+ * Implements HOOK_form_FORM_ID_alter().
+ */
+function menu_builder_form_menu_edit_menu_alter(&$form, &$form_state) {  
+  $form['menu_additions'] = array(
+    '#type' => 'vertical_tabs',
+    '#weight' => 50,
+  );
+  
+  $menus = variable_get(MENU_BUILDER_VAR_MENUS, array());
+  $menu_name = isset($form_state['value']['menu_name']) ? $form_state['values']['menu_name']
+    : (isset($form['menu_name']['#default_value']) ? $form['menu_name']['#default_value'] : NULL);
+
+  // Generate menu builder settings for the overall menu item.
+  $form['menu_builder'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Menu Builder'),
+    '#group' => 'menu_additions',
+    '#tree' => TRUE,
+    '#description' => t(''),
+    
+    'enabled' => array(
+      '#type' => 'checkbox',
+      '#title' => t('Use Menu Builder'),
+      '#default_value' => !empty($menus[$menu_name]['enabled']),
+    ),
+  );
+  
+  // Add our submit callback, to save our settings correctly.
+  $form['#submit'][] = '_menu_builder_menu_edit_settings_submit';
+}
+
+/**
+ * Implements HOOK_form_alter()
+ */
+function menu_builder_form_alter(&$form, &$form_state, $form_id) {
+	// Different forms use place the menu options into a different place
+	// this is where we locate and make a reference for consistent use later.
+  switch ($form_id) {
+    case 'menu_edit_item':
+    	$base = &$form;
+    	$form['#menu_options_parents'] = array();
+      $values = isset($form_state['values']) ? $form_state['values'] : FALSE;
+      break;
+    case 'node_form':
+    	if (isset($form['menu'])) {
+    		$base = &$form['menu'];
+    		$form['#menu_options_parents'] = array('menu');
+    		$values = isset($form_state['values']) ? $form_state['values']['menu'] : FALSE;
+    		break;
+    	}
+    default:
+      return;  // A form that doesn't contain menu item or isn't yet supported.
+  }
+
+  iwapi_include('elements');
+  
+  // Add our additional menu options / properties to the mix.
+  $opt_info = _menu_builder_get_menu_options_info();
+  $defaults = empty($values) ? $base['original_item']['#value']['options'] : $values;
+ 
+  // Fill in default values of any options that are included in the form and have a value.
+  $stack[] = (object)array('form' => &$opt_info['form'], 'values' => $defaults);
+
+  while ($tos = array_pop($stack)) {
+    foreach (element_children($tos->form) as $idx) {
+      if (isset($tos->values[$idx]) && !empty($tos->values[$idx])) {
+        if ($tos->form[$idx]['#type'] == 'fieldset') {
+          $obj = new stdClass();
+          $obj->form   = &$tos->form[$idx];
+          $obj->values = $tos->values[$idx]; 
+          array_unshift($stack, $obj);
+        }
+        else {
+          $tos->form[$idx]['#default_value'] = is_array($tos->values[$idx]) ? 
+            implode(' ', $tos->values[$idx]) : $tos->values[$idx];
+        }
+      }
+    }
+  }
+
+  // Add our custom / additional validate and submit callbacks.
+  array_unshift($form['#validate'], '_menu_builder_menu_options_validate');
+  array_unshift($form['#submit'], '_menu_builder_menu_options_submit');
+  
+  if (empty($base['options']) || $base['options']['#type'] == 'value') {
+    $base['options'] = array(
+      '#tree' => TRUE,
+      '#weight' => 20,
+    );
+  }
+  $base['options'] += $opt_info['form'];
+}
+
+/**
+ * Menu load callback to load menu information for menus
+ * that are enabled by menu_builder.
+ * 
+ * @param $menu_name
+ *  Name of the menu to try an retrieve.
+ * @return <mixed>
+ *  Returns and array of menu information from menu_load()
+ *  if the menu exists, and has menu_builder enabled.
+ *  Returns FALSE otherwise.
+ */
+function menu_builder_menu_load($menu_name) {
+  if ($menu = menu_load($menu_name)) {
+    $builders = variable_get(MENU_BUILDER_VAR_MENUS, array());
+    return empty($builders[$menu_name]['enabled']) ? FALSE : $menu;
+  }
+  return FALSE;
+}
+
+// =================================================
+// Customized hook functionality
+// =================================================
+
+/**
+ * Get the menu styles that are available to the menu
+ * builder system for rendering menu options.
+ * 
+ * @param $reset
+ *  Boolean to indicate if the style information should
+ *  be reset, or if cached data is okay.
+ */
+function _menu_builder_get_menu_styles($reset = FALSE) {
+  $styles = &drupal_static(__FUNCTION__, NULL, $reset);
+  
+  if (!isset($styles)) {
+    $styles = module_invoke_all('menu_style_info');
+  }
+  return $styles;
+}
+
+
+/**
+ * Implements HOOK_menu_builder_style_info().
+ */
+function menu_builder_menu_style_info() {
+  return array(
+    'basic' => array(
+      'label' => t('Basic'),
+      'handler' => 'MenuBuilderStyle',
+    ),
+    'columns' => array(
+      'label' => t('Columns'),
+      'handler' => 'ColumnsMenuStyle',
+    ),
+  );
+}
+
+/** 
+ * Generate options for menu items.
+ * 
+ * @return array
+ *  Of all the additional options that get included into
+ *  a menu item.
+ */
+function _menu_builder_get_menu_options_info($reset = FALSE) {
+	$info = &drupal_static(__FUNCTION__, NULL, $reset);
+
+	if (!isset($info)) {
+	  $options = module_invoke_all('menu_builder_options_info');
+	  drupal_alter('menu_builder_options_info', $options);
+	  
+	  // Parse and build the actual menu option information into something
+	  //  manageable and ready for inclusion to forms.
+	  $form_extra = array();
+	  $info = array('validate' => array(), 'callbacks' => array());
+
+	  // Go through the possible options and rearrange the items.
+	  foreach ($options as $name => $item) {
+	    if (isset($item['form']) && is_array($item['form'])) {
+	      $item['form']['#tree'] = TRUE;
+	    	$form_extra[$name] = $item['form'] + array(
+	    	  '#type' => 'fieldset',
+	    	  '#title' => check_plain(t(ucfirst($name))),
+	    	  '#collapsed' => TRUE,
+	    	  '#collapsible' => TRUE,
+	    	);
+	  
+		    if (!empty($item['validate']) && function_exists($item['validate'])) {
+		      $info['validate'][$name] = $item['validate'];
+		    }
+		    if (!empty($item['submit']) && function_exists($item['submit'])) {
+		      $info['submit'][$name] = $item['submit'];
+		    }
+	    }
+	  }
+	  $info['form'] = $form_extra;
+	}
+  return $info;
+}
+
+/**
+ * Implements HOOK_menu_builder_options_info()
+ */
+function menu_builder_menu_builder_options_info() {
+	$styles = array_keys(image_styles());
+	$styles = array_combine($styles, $styles);
+	
+  $info['icon'] = array(
+    'form' => array(
+      '#title' => t('Menu Icon'),
+
+      'image' => array(
+        '#type'      => 'image_selector',
+        '#directory' => 'menu_icons',
+      ),
+      'style' => array(
+      	'#type' => 'select',
+      	'#title' => t('Image style'),
+        '#empty_option' => t('Original'),
+      	'#options' => $styles, 
+      ),
+    ),
+  );
+  
+   
+  $info['attributes'] = array(
+    'validate' => '_menu_builder_attributes_validate',
+    'submit'   => '_menu_builder_attributes_callback',
+  );
+  $info['attributes']['form'] = array(
+    '#title' => t('Attributes'),
+
+    'id' => array(
+      '#type' => 'textfield',
+      '#title' => t('ID'),
+      '#description' => t('Specifies a unique ID for the link'),
+    ),
+    'class' => array(
+      '#type' => 'textfield',
+      '#title' => t('Classes'),
+      '#description' => t('List of CSS classes to apply to the link. Separate classes with spaces.'),
+    ),
+    'target' => array(
+      '#type' => 'select',
+      '#title' => t('Link Target'),
+      '#empty_option' => t('-- None --'),
+      '#options' => array(
+        '_blank' => t('New window or tab'),
+        '_parent' => t('Parent frameset'),
+        '_top' => t('Full body of window'),
+      ),
+    ),
+    'rel' => array(
+      '#type' => 'select',
+      '#title' => t('Relationship'),
+      '#empty_option' => t('-- None --'),
+      '#options' => array(
+        'alternate' => t('Alternate version of document'),
+        'chapter'   => t('A chapter of the document'),
+        'section'   => t('A section of the document'),
+        'bookmark'  => t('A related document'),
+        'nofollow'  => t('No follow'),
+      ),
+      '#description' => t(
+        'Specifies the relationship between the current page and the link. Enter "%follow" here to nofollow this link.',
+         array('%follow' => 'No follow')
+      ),
+    ),
+  );
+  return $info;
+}
+
+
+// ===============================
+// Theme and preprocess functions
+// ===============================
+
+/**
+ * Implements HOOK_theme().
+ */
+function menu_builder_theme($existing, $type, $theme, $path) {
+  return array(
+    'menu_builder_column' => array(
+      'render element' => 'element',
+      'path' => $path . '/theme',
+      'file' => 'theme.inc',
+    ),
+  );
+}
+
+/**
+ * Implements TEMPLATE_preprocess_menu_link().
+ */
+function menu_builder_preprocess_menu_link(array &$variables) {
+  $element = &$variables['element'];
+
+  // Change the menu link to support an icon, if specified.
+  if (!empty($element['#localized_options']['icon']['image'])) {
+    $icon = $element['#localized_options']['icon'];
+    $file = file_load($icon['image']);
+
+    $title = empty($element['#localized_options']['attributes']['title']) ? 
+      $element['#title'] : $element['#localized_options']['attributes']['title'];
+
+    $func = empty($icon['style']) ? 'image' : 'image_style';
+    $icon = theme($func, array(
+      'style_name' => $icon['style'],
+      'path' => $file->uri,
+      'alt' => $title,
+      'title' => $title,
+    ));
+
+    $element['#title'] = $icon . check_plain($element['#title']);
+    $element['#localized_options']['html'] = TRUE;
+  }
+}
+
+// =================================================
+// Managing menu item options validate and callback
+// =================================================
+
+/**
+ * Form submit callback for the altered menu_edit_menu form.
+ */
+function _menu_builder_menu_edit_settings_submit($form, &$form_state) {
+  $values = $form_state['values'];
+  
+  // I'm not super fond of this method but menu_edit_menu_submit does
+  // not do a good job of adjusting the modified name back to form_state.
+  $menu_name = ($form['#insert'] ? 'menu-': '') . $values['menu_name'];
+  
+  $builder_menus = variable_get(MENU_BUILDER_VAR_MENUS, array());
+  unset($builder_menus[$menu_name]);
+  if (!empty($values['menu_builder']['enabled'])) {
+    $builder_menus[$menu_name] = $values['menu_builder'];
+  }
+  variable_set(MENU_BUILDER_VAR_MENUS, $builder_menus);
+}
+
+/**
+ * Form validation callback function for all menu options. This function
+ * determines the location of the menu options, and passes the appropriate
+ * form references to the individual menu option handlers.
+ */
+function _menu_builder_menu_options_validate($form, &$form_state) {
+  _menu_builder_menu_options_callback('validate', $form, $form_state);
+}
+
+/**
+ * Form submit callback function for all menu options. This function
+ * determines the location of the menu options, and passes the appropriate
+ * form references to the individual menu option handlers.
+ * 
+ * It also moves our values into the actual menu options.
+ */
+function _menu_builder_menu_options_submit(&$form, &$form_state) {
+  _menu_builder_menu_options_callback('submit', $form, $form_state);
+}
+
+/**
+ * Finds the menu options elements from the $form and $form_state
+ * variables and runs option callbacks from their relevant scopes.
+ * 
+ * @param $op
+ *  Name of the form action to be triggered, should be "validate" or "submit".
+ * @param $form
+ *  Structure of the full form, this will be used to derive the correct
+ *  form elements to use for the callback.
+ * @param $form_state
+ *  Current state and values of the full form.
+ */
+function _menu_builder_menu_options_callback($op, $form, &$form_state) {
+  $fields = $form;
+  $values = &$form_state['values'];
+  
+  array_push($form['#menu_options_parents'], 'options');
+  foreach ($form['#menu_options_parents'] as $parent) {
+    if (!isset($fields[$parent])) {
+      form_set_error('', t('Unable to find %name as a menu_option', array('%name' => $parent)));
+      return;
+    }
+    $fields = $fields[$parent];
+    if (!empty($fields['#tree'])) {
+      $values = &$values[$parent];
+    }
+  }
+  
+  // Call the correct operation to run the menu validate or submission.
+  $info = _menu_builder_get_menu_options_info();
+  foreach ($info[$op] as $scope => $handler) {
+    $handler($fields[$scope], $values[$scope], $form_state);
+  }
+}
+
+/**
+ * Form validation function for menu item attributes.
+ */
+function _menu_builder_attributes_validate($fields, &$values, &$form_state) {
+  // Filter and clean up the ID property of the menu item (ensure only one item).
+  $id = trim($values['id']);
+  if (preg_match('#^[\-_\w]*$#', $id) > 0) {
+  	form_set_value($fields['id'], $id, $form_state);
+  }
+  else {
+    form_set_error($fields['id'], t('The ID attribute should only contain be numbers, letters, underscores and hyphens.'));
+  }
+  
+  // Filter and check the validity of the entered in class values
+  $class = trim($values['class']);
+  if (preg_match('#^(\s*[\-_a-z][\-_\w]*)*$#i', $class) > 0) {
+    $class = preg_replace(array('#(_+|-+)#', '#\s+#'), array('-', ' '), strtolower($class));
+    form_set_value($fields['class'], $class, $form_state);
+  }
+  else {
+    form_error($fields['class'], t(
+      'The class attribute should only contain be numbers, letters, underscores and hyphens separated by spaces.'
+    ));
+  }
+}
+
+/**
+ * Save the menu item attribute, putting them in the correct locations
+ *  and filtering out the empty values.
+ */
+function _menu_builder_attributes_callback($fields, &$values, &$form_state) {
+  $values['class'] = empty($values['class']) ? array() : explode(' ', $values['class']);
+}

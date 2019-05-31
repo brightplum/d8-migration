@@ -1,0 +1,50 @@
+// Style for petitions.
+#block-block-69,
+#block-block-69--2,
+#block-block-62--2 {
+  display: inline-block;
+  float: left;
+  margin: 0 2rem 2rem 0;
+  .block__content {
+    background: #f0f0f0;
+    padding: 1rem;
+    h2 {
+      margin-top: 0;
+    }
+    form {
+      label {
+        display: none;
+      }
+      input {
+        width: 100%;
+        padding: 0.25rem;
+      }
+      .floatlabel-wrapper {
+        padding: 0.5rem 0;
+        &:first-child {
+          padding-top: 0;
+        }
+      }
+    }
+  }
+  .country_drop_wrap,
+  .ajax-loading,
+  #d_sharing,
+  #logo_wrap,
+  #action_info {
+    display: none;
+  }
+}
+#block-block-70,
+#block-block-63--2 {
+  display: inline-block;
+  float: left;
+  margin: 0 2rem 2rem 0;
+  .country_drop_wrap,
+  .ajax-loading,
+  #d_sharing,
+  #logo_wrap,
+  #action_info {
+    display: none;
+  }
+}

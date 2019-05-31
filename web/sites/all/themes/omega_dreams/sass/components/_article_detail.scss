@@ -1,0 +1,218 @@
+﻿@import "susy";
+$phone: 20em 12 44em;
+$tab: 768px 16;
+$desk: 1024px 16;
+$large: 1440px 16;
+
+
+
+.field--name-field-subtitle {
+	font-family: $font-serif;
+	font-size: 20px;
+	margin-bottom: 5px;
+	p { margin: 0; }
+}
+
+#field-wrapper-author,
+#field-wrapper-authors {
+    font-family: $font_sans;
+    margin-top: 0;
+}
+
+.field--name-field-author-profile  {
+  margin: 50px 0;
+        
+  > .field__items > .field__item {
+    margin: 0 0 10px 0;
+  }
+
+  h2 { display: none; }
+  
+  .field--name-field-image,
+  .field--name-field-profile-img {
+    float: left;
+    margin: 4px 12px 10px 0;
+  }
+
+  .field--name-field-desc p {
+    margin: 0 0 1em 0;
+    font-size: 0.9em;
+  }
+}
+
+.field--name-field-copyright {
+    text-align: center;
+}
+
+h1.node__title {
+  margin-bottom: 5px !important;
+  font-size: 1.75rem;
+  @include at-breakpoint($desk) {
+    font-size: 2.25rem;
+  }
+}
+
+#field-wrapper-attribution {
+  font-family: $font_condensed;
+  font-size: 14px;
+  font-style: italic;
+  margin-bottom: 5px;
+  
+  .grouping-prefix {
+    margin-left: 0;
+    margin-right: 0.21em;
+  }
+  
+  p { margin: 0; }
+}
+
+#field-wrapper-authors {
+    margin: 0 0 20px 0;
+    line-height: 10px;
+    .grouping-prefix,
+    .grouping-spacer {
+        margin-left: 0 !important;
+        margin-right: 0.21em !important;
+    }
+}
+
+.grouping-prefix {
+margin-left: 0;
+margin-right: 0.21em !important;
+}
+
+.shareaholic-canvas {
+	margin-bottom: 10px;
+}
+
+.field-wrapper  {
+	margin: 10px 0;
+	h3.field-wrapper-title {
+		margin: 0;
+		font-size: 24px;
+		font-weight: bold;
+		@extend .underline;
+	}
+}
+
+.field--name-body {
+  .pullquote {
+    color: #111111;
+    font-size: 18px;
+    font-variant: normal;
+    font-weight: bold;
+    line-height: 24px;
+    margin-bottom: 0;
+    margin-top: 0;
+    text-align: center;
+    float: none;
+    width: 100%;
+    padding: 0;
+    @include at-breakpoint($tab) {
+      text-align: right;
+      float: right;
+      width: 40%;
+      padding-bottom: 20px;
+      padding-left: 20px;
+    }
+  }
+}
+
+#field-wrapper-share-this-article {
+  margin-bottom: 50px;
+}
+
+.field--name-field-main-caption {
+   font-family: $font_sans;
+  background: $color_bg_sidebar;
+  color: $color_body;
+  position: relative;
+  top: -4px;
+  font-size: 12px;
+  font-style: normal;
+  padding: 5px 10px;
+
+  p { margin: 0; }
+}
+
+.field--name-field-copyright {
+    border-top: solid 1px #cccccc;
+    padding-top: 10px;
+}
+
+.grouping-spacer {
+    margin: 0 0.3em !important;
+}
+
+.discourse-comments {
+  margin-bottom: 1rem;
+}
+
+.iwsearch-related-content {
+  h3 {
+    margin: 0 0 10px 0;
+    font-size: 24px;
+    font-weight: bold;
+    @extend .underline;
+  }
+  .related-item {
+    width: 100%;
+    float: left;
+    border-bottom: solid 1px $color_bg_sidebar;
+    margin-bottom: 10px;
+    padding: 10px 0;
+    clear: both;
+    overflow: hidden;
+    &:last-child {
+      margin-right: 0;
+    }
+
+
+    @include breakpoint(768px) {
+      width: 25%;
+      float: left;
+      border-bottom: none;
+      margin-bottom: 0;
+      clear: none;
+      padding: 2%;
+    }
+    @include breakpoint($tab) {
+      width: 25%;
+    }
+
+    .node {
+      padding: 0;
+
+      .field--type-image {
+        float: left;
+        padding-right: 0.5rem;
+        width: 50%;
+        a {
+          display: block;
+          img {
+            width: 100%;
+          }
+        }
+        @include breakpoint(768px) {
+          width: 100%;
+          float: none;
+          padding:0;
+        }
+      }
+
+      .field--name-field-hp-title {
+        @extend .article-title;
+        font-weight: normal;
+        font-family: $font_serif;
+        font-size: 14px;
+        padding: 0;
+        a {
+          color: $color_article_title;
+        }
+      }
+    }
+
+  }
+  
+  .omega { margin-right: 0; }
+}

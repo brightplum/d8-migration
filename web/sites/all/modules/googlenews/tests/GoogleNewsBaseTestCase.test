@@ -1,0 +1,59 @@
+<?php
+
+/**
+ * @file
+ * Base test class for other GoogleNews tests to expand upon.
+ */
+
+/**
+ * Base test class for other GoogleNews tests to expand upon.
+ */
+abstract class GoogleNewsBaseTestCase extends DrupalWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    // Enable this custom module.
+    $modules[] = 'googlenews';
+    parent::setUp($modules);
+
+    // Log in as user 1.
+    $this->loginUser1();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function verbose($message, $title = NULL) {
+    // Handle arrays, objects, etc.
+    if (!is_string($message)) {
+      $message = "<pre>\n" . print_r($message, TRUE) . "\n</pre>\n";
+    }
+
+    // Optional title to go before the output.
+    if (!empty($title)) {
+      $title = '<h2>' . check_plain($title) . "</h2>\n";
+    }
+
+    parent::verbose($title . $message);
+  }
+
+  /**
+   * Log in as user 1.
+   */
+  protected function loginUser1() {
+    $password = user_password();
+    // Reset the user 1 password.
+    $account = user_load(1);
+    $edit = array(
+      'pass' => $password,
+    );
+    $account = user_save($account, $edit);
+    $account->pass_raw = $password;
+
+    // Log in as user 1.
+    $this->drupalLogin($account);
+  }
+
+}

@@ -1,0 +1,85 @@
+<?php
+
+function cd_organizer_menu() {
+  $item['admin/content/organizer/update'] = [
+    'title' => 'Update Content Taxonomy',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['cd_organizer_update_form'],
+    'access callback' => 'cd_organizer_update_access_callback',
+    'type' => MENU_CALLBACK,
+  ];
+  $item['admin/content/organizer/update'] = [
+    'title' => 'Update Content Taxonomy',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['cd_organizer_update_form'],
+    'access callback' => 'cd_organizer_update_access_callback',
+    'type' => MENU_CALLBACK,
+  ];
+  return $item;
+}
+
+function cd_organizer_update_access_callback() {
+  global $user;
+  return in_array('administrator', $user->roles);
+}
+
+function cd_organizer_update_form($form, &$form_state, $nodes) {
+  $form = [];
+  $nodes = node_load_multiple(explode(',', $nodes));
+
+  $form['#update_nodes'] = $nodes;
+
+  $form['tags'] = [
+    '#type' => 'textfield',
+    '#title' => 'Add Tags',
+    '#autocomplete_path' => 'taxonomy/autocomplete/field_topics',
+  ];
+
+  $form['submit'] = [
+    '#type' => 'submit',
+    '#value' => t('Save')
+  ];
+
+  $form['content'] = [
+    '#theme' => 'cd_organizer_update_description',
+    '#nodes' => $nodes
+  ];
+
+  return $form;
+}
+
+function cd_organizer_update_form_submit($form, &$form_state) {
+  foreach ($form['#update_nodes'] as $node) {
+    if (!empty($form_state['values']['tags'])) {
+      $values = explode(',', $form_state['values']['tags']);
+      foreach ($values as $key => $value) {
+        $term = taxonomy_get_term_by_name($value, 'topic');
+        if ($term) {
+          $term = current($term);
+          $node->field_topics[LANGUAGE_NONE][] = ['tid' => $term->tid];
+          field_attach_presave('node', $node);
+          field_attach_update('node', $node);
+          entity_get_controller('node')->resetCache(array($node->nid));
+          taxonomy_node_update($node);
+        }
+      }
+    }
+
+  }
+
+  drupal_set_message('Added taxonomy');
+  $form_state['redirect'] = '/admin/content/organizer';
+}
+
+/**
+ * Implements hook_theme().
+ */
+function cd_organizer_theme($existing, $type, $theme, $path) {
+  return [
+    'cd_organizer_update_description' => [
+      'variables' => ['nodes' => NULL],
+      'template' => 'cd-organizer-update-description',
+      'path' => drupal_get_path('module', 'cd_organizer') . '/templates'
+    ]
+  ];
+}

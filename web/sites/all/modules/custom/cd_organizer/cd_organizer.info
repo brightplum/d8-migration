@@ -1,0 +1,5 @@
+name = Common Dreams Organizer
+description = Common Dreams Organizer
+core = 7.x
+package = CD
+version = 7.x-1.0

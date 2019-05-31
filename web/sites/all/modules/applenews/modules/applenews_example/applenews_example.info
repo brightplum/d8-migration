@@ -1,0 +1,15 @@
+name = Apple News Example
+package = Apple News
+description = Example module with a styled node export.
+core = 7.x
+
+files[] = include/export.inc
+files[] = include/destination.inc
+
+dependencies[] = applenews
+
+; Information added by Drupal.org packaging script on 2018-10-24
+version = "7.x-2.x-dev"
+core = "7.x"
+project = "applenews"
+datestamp = "1540340285"

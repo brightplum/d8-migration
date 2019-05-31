@@ -1,0 +1,39 @@
+﻿
+
+
+
+.view-id-progressive_community    {
+    .view-filters {
+        label { 
+            float: left;
+            margin-top: 2px;
+            margin-right: 10px;
+        }
+    }
+    .views-widget {
+        float: left;
+    }
+    table {
+        width: 100%;
+
+        tr {
+            td {
+                vertical-align: top;
+                padding: 20px 20px 20px 0px !important;
+                float: none !important;
+                display: table-cell !important;
+                border-top: solid 1px #cccccc;
+                &.views-field-field-image-1 {
+                    width: 191px;
+                }
+                > a {
+                    display: inline-block;
+                    background-color: $color_bg_sidebar;
+                    padding: 2px;
+                    margin-right: 10px;
+                }
+            }
+        }
+    }
+
+}

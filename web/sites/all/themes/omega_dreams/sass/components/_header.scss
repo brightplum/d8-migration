@@ -1,0 +1,388 @@
+﻿@import "susy";
+$phone: 20em 12 44em;
+$tab: 768px 16;
+$desk: 1024px 16;
+$large: 1440px 16;
+
+body {
+  padding-top: 70px !important;
+  @include at-breakpoint($tab) {
+    padding-top: 150px !important;
+  }
+  @include at-breakpoint($desk) {
+    padding-top: 130px !important;
+  }
+}
+
+body.imce {
+  padding-top: 0 !important;
+}
+
+#header-container {
+  @include transition(all .3s ease);
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  width: 100%;
+  background: #fff;
+  box-shadow: 1px 1px 15px #333;
+
+  #header-top {
+    position: relative;
+    z-index: 2;
+    background: $color_bg_header;
+    color: #fff;
+    padding: 0 0.5rem;
+    @include at-breakpoint($tab) {
+      padding: 0 1rem;
+    }
+    a {
+      color: #fff;
+    }
+    .l-header {
+      display: flex;
+      display: -webkit-box;
+      display: -webkit-flex;
+      justify-content: space-between;
+      align-items: center;
+      -webkit-align-items: center;
+      margin-bottom: 0;
+      .col {
+        display: flex;
+        display: -webkit-box;
+        display: -webkit-flex;
+        &.header-left {
+          flex: 2;
+          align-items: center;
+          #mobile-menu-wrapper {
+            display: flex;
+            display: -webkit-box;
+            display: -webkit-flex;
+            align-items: center;
+            -webkit-align-items: center;
+
+            .label {
+              margin-left: 0.5rem;
+              font-weight: bold;
+            }
+
+            #slide-menu-button {
+              background-repeat: no-repeat;
+              display: flex;
+              display: -webkit-box;
+              display: -webkit-flex;
+              justify-content: flex-start;
+              -webkit-justify-content: flex-start;
+              align-items: center;
+              -webkit-align-items: center;
+              opacity: 1;
+              position: relative;
+              transition-duration: 0.3s;
+              height: 0.75em;
+
+              &:after {
+                font-size: 10.5px;
+                content: "ESC";
+                position: absolute;
+                text-align: center;
+                width: inherit;
+                top: 3em;
+                left: 0;
+                display: none;
+              }
+
+              .slide-menu-lines {
+                @include transition(all .3s ease);
+                //top: 0.2em;
+                position: relative;
+                display: block;
+                background-color: #FFF;
+                transform-origin: center;
+                width: 0.75em;
+                height: 2px;
+
+                @include at-breakpoint($tab) {
+                  width: 1.5em;
+                }
+
+                &:before, &:after {
+                  @include transition(all .3s ease);
+                  transform-origin: center;
+                  content: "";
+                  left: 0;
+                  top: 0;
+                  position: absolute;
+                  background-color: #FFF;
+                  height: 2px;
+                  width: 100%;
+                }
+
+                &:before {
+                  top: -0.25em;
+                  @include at-breakpoint($tab) {
+                    top: -0.5em;
+                  }
+                }
+                &:after {
+                  top: 0.3em;
+                  @include at-breakpoint($tab) {
+                    top: 0.5em;
+                  }
+                }
+              }
+
+              // Active.
+              &.open {
+                top: 0.5em;
+                @include at-breakpoint($tab) {
+                  top: 0;
+                }
+                &:after {
+                  display: block;
+                }
+                .slide-menu-lines {
+                  background-color: transparent;
+                  &:before {
+                    transform: rotate(45deg) translate(-0.03em, -0.03em);
+                    @include at-breakpoint($tab) {
+                      transform: rotate(45deg) translate(0.3em, 0.3em);
+                    }
+                  }
+                  &:after {
+                    transform: rotate(-45deg) translate(0.4em, -0.4em);
+                    @include at-breakpoint($tab) {
+                      transform: rotate(-45deg) translate(0.4em, -0.4em);
+                    }
+                  }
+                }
+              }
+            }
+            .label {
+              display: none;
+              @include at-breakpoint($desk) {
+                display: inline;
+                text-transform: uppercase;
+              }
+            }
+          }
+          #search-icon {
+            padding-left: 1rem;
+            #search-toggle.active {
+              color: #FFCC00;
+            }
+            @include at-breakpoint($tab) {
+              padding-left: 2rem;
+            }
+          }
+        }
+        &.header-middle {
+          justify-content: center;
+          -webkit-justify-content: center;
+          flex: 8;
+          .site-logo {
+            display: block;
+            img {
+              @include transition(all .3s ease);
+              max-width: 100px;
+              @include at-breakpoint($tab) {
+                max-width: 300px;
+              }
+            }
+          }
+        }
+        &.header-right {
+
+          @include at-breakpoint($tab) {
+            flex: 2;
+            justify-content: flex-end;
+            -webkit-justify-content: center;
+          }
+          .button {
+            border-radius: 3px;
+            margin: 0 0.5rem;
+            font-size: 0.7rem;
+            @include at-breakpoint($tab) {
+              font-size: 1rem;
+            }
+            &.button--secondary {
+              background: #FFF;
+              color: $color_bg_header;
+            }
+            &.button--primary {
+                background: #FFCC00;
+              color: $color_bg_header;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Fundraiser Change.
+  &.fundraiser {
+    .button--primary {
+      background: $fundraiser_color !important;
+      color: #fff !important;
+    }
+  }
+
+  // Header Content.
+  #header-content {
+    @include transition(height .7s ease);
+    position: relative;
+    z-index: 1;
+    height: 0;
+    background: #f0f0f0;
+    text-align: center;
+    display: flex;
+    display: -webkit-box;
+    display: -webkit-flex;
+    justify-content: center;
+    align-items: stretch;
+    overflow: hidden;
+
+    .l-region--header {
+      width: 100%;
+      display: flex;
+      display: -webkit-box;
+      display: -webkit-flex;
+      justify-content: center;
+      -webkit-justify-content: center;
+      align-items: center;
+      -webkit-align-items: center;
+    }
+
+    #block-search-form {
+      width: 80%;
+      max-width: 600px;
+      .container-inline {
+        width: 100%;
+        display: flex;
+        display: -webkit-box;
+        display: -webkit-flex;
+        justify-content: center;
+        -webkit-justify-content: center;
+        -webkit-align-items: center;
+        align-items: center;
+        .form-item {
+          flex: 11;
+          input {
+            width: 100%;
+            background: #eee;
+            border-bottom: 1px solid #000;
+            padding: 0;
+            font-size: 2rem;
+            color: #000;
+            @include transition(opacity 3s ease);
+            &:focus {
+              outline: none;
+            }
+            @include at-breakpoint($tab) {
+              padding: 20px 20px 20px 0;
+              font-size: 3rem;
+            }
+          }
+          ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+            color: #ccc;
+          }
+          ::-moz-placeholder { /* Firefox 19+ */
+            color: #ccc;
+          }
+          :-ms-input-placeholder { /* IE 10+ */
+            color: #ccc;
+          }
+          :-moz-placeholder { /* Firefox 18- */
+            color: #ccc;
+          }
+        }
+        .form-actions {
+          flex: 1;
+          button {
+            background: transparent;
+            border: none;
+            font-size: 1.25rem;
+            color: #ccc;
+            //display: none;
+            //opacity: 0;
+            @include transition(opacity 3s ease);
+            @include at-breakpoint($tab) {
+              font-size: 3rem;
+            }
+          }
+        }
+      }
+    }
+
+    &.showing {
+      height: 100px;
+      input {
+        display: block;
+        opacity: 1;
+      }
+      i {
+        display: inline-block;
+        opacity: 1;
+      }
+
+      @include at-breakpoint($tab) {
+        height: 150px;
+      }
+    }
+  }
+}
+
+// Slim Header Fixed.
+body.header-container-slim {
+  #header-container {
+    z-index: 100;
+    #header-top {
+      .l-header {
+        .header-left {
+
+        }
+        .header-middle {
+          .site-logo {
+            img {
+              max-width: 100px;
+              @include at-breakpoint($tab) {
+                max-width: 150px;
+              }
+            }
+          }
+        }
+      }
+    }
+    #navigation-container {
+      ul.menu {
+        li {
+          a {
+            font-size: 0.875rem;
+            padding: 0.5rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+body.cta-slide-down-from-top-applied {
+  #header-container {
+    z-index: 100;
+    box-shadow: none;
+  }
+}
+
+#highlighted-container {
+  ul.menu {
+    padding: 0;
+    margin: 1.5rem 0 0 0;
+    display: flex;
+    justify-content: center;
+    li {
+      list-style: none;
+      a {
+        padding: 0 1rem;
+      }
+    }
+  }
+}

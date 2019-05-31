@@ -1,0 +1,37 @@
+;
+; Developer: Image Works (http://www.imagewks.com)
+;
+; Author(s): Liem Khuu   (liem@imagewks.com)
+;            Neil Arnold (neil@imagewks.com)
+; ==========================================
+
+name = Drupal 6 Importer
+package = Image Works Utilities
+description = Provides additional classes and utilities for importing Drupal 6 content.
+
+php = 5.3
+core = 7.x
+version = 7.x-beta1
+
+dependencies[] = iwapi
+
+
+; Import classes
+; ==================================
+
+files[] = lib/fields/iwD6Fields.inc
+files[] = lib/fields/d6TermFieldReader.inc
+
+files[] = lib/mappers/iwD6FileMapper.inc
+files[] = lib/mappers/iwD6MarkupMapper.inc
+
+files[] = lib/readers/iwD6FileReader.inc
+files[] = lib/readers/iwD6NodeReader.inc
+files[] = lib/readers/iwD6TermReader.inc
+files[] = lib/readers/iwD6NodeAliasReader.inc
+
+files[] = lib/writers/TrackedTermWriter.inc
+files[] = lib/writers/TrackedFileWriter.inc
+files[] = lib/writers/TrackedNodeWriter.inc
+files[] = lib/writers/TrackedEntityWriter.inc
+files[] = lib/writers/DisqusWriter.inc

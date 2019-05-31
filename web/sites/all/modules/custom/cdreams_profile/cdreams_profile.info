@@ -1,0 +1,31 @@
+;
+; Developer: Image Works (http://www.imagewks.com)
+;
+; Author(s): Liem Khuu   (liem@imagewks.com)
+;            Neil Arnold (neil@imagewks.com)
+; ==========================================
+
+name = Common Dreams Profiles
+package = Common Dreams
+description = Embeddable profiles for authors, organizations and sources.
+
+php = 5.3
+core = 7.x
+version = 7.x-0.9
+
+dependencies[] = iwapi
+
+configure = admin/structure/cdreams-profiles
+
+
+; Entity
+; ==================================
+
+files[] = lib/entity/cdProfileEntity.inc
+files[] = lib/import/cdTrackedProfileWriter.inc
+
+
+; Views
+; ==================================
+
+files[] = views/cdreams_profile_views_handler_field_entity_bundle.inc

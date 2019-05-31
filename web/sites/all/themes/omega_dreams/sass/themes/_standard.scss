@@ -1,0 +1,22 @@
+#navigation.slide-menu {
+  background: #f0f0f0;
+
+  #close-slide-menu-button {
+    a {
+      color: #999;
+      &:hover {
+        color: #336699;
+      }
+    }
+  }
+
+  .slide-menu-container {
+    ul.menu {
+      li {
+        a {
+          color: #369;
+        }
+      }
+    }
+  }
+}
