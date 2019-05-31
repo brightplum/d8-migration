@@ -1,0 +1,34 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the minimal installation profile.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * Performs actions to set up the site for this profile.
+ *
+ * @see system_install()
+ */
+function imageworks_install() {
+  $themes = list_themes(TRUE);
+  
+  // Figure out if there is a special admin theme to set.
+  foreach (array('rubik', 'rootcandy') as $name) {
+    if (isset($themes[$name])) {
+      variable_set('admin_theme', 'name');
+
+      if (empty($themes[$name]['status'])) {
+        theme_enable($enable_themes);
+      }
+    }
+  }
+
+  // Allow visitor account creation, but with administrative approval.
+  variable_set('user_register', USER_REGISTER_ADMINISTRATORS_ONLY);
+
+  // Enable default permissions for system roles.
+  user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access content'));
+  user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, array('access content'));
+}

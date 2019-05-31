@@ -1,0 +1,13 @@
+;
+; Developer: Image Works (http://www.imagewks.com)
+;
+; Author(s): Liem Khuu   (liem@imagewks.com)
+;            Neil Arnold (neil@imagewks.com)
+; ==========================================
+
+name = Tuckaway Header
+package = Image Works Utilities
+description = Allow the inclusion of H1 tuckaway headers for all entity types.
+
+core = 7.x
+version = 7.x-1.0

@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * Test basic functionality of GoogleNews.
+ */
+
+/**
+ * Test basic functionality of GoogleNews.
+ */
+class GoogleNewsBasicsTestCase extends GoogleNewsBaseTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'GoogleNews',
+      'description' => 'Confirm that the basic functionality works.',
+      'group' => 'googlenews',
+    );
+  }
+
+  /**
+   * Check the main admin form.
+   */
+  public function testSettings() {
+    // Load the front page.
+    $this->drupalGet('admin/config/search/googlenews');
+    $this->assertResponse(200);
+
+    // Confirm expected fields are presented.
+    $this->assertText('Settings for controlling the');
+    $this->assertText('There are currently 0 node(s) suitable for output.');
+    $this->assertFieldByName('googlenews_publication_name');
+    $this->assertFieldByName('googlenews_cache_timeout');
+    $this->assertFieldByName('googlenews_content_hours');
+    $this->assertFieldByName('googlenews_base_url');
+    foreach (node_type_get_names() as $name => $label) {
+      $this->assertFieldByName('googlenews_node_types[' . $name . ']');
+    }
+  }
+
+}

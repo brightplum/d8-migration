@@ -1,0 +1,12 @@
+{
+    "name": "commondreams/ctas",
+    "require": {
+        "stripe/stripe-php": "^6.30"
+    },
+    "authors": [
+        {
+            "name": "joeybarra",
+            "email": "joe@focal55.com"
+        }
+    ]
+}

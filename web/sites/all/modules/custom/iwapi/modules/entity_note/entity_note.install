@@ -1,0 +1,110 @@
+<?php
+/**
+ * @file
+ * Installation, configuration and update functions for entity_note module.
+ */
+
+
+// -------------------------------------
+// Drupal core HOOKs
+// -------------------------------------
+ 
+/**
+ * Implements HOOK_uninstall().
+ */
+function entity_note_uninstall() {
+  $rs = db_select('variable', 'var')
+    ->fields('var', array('name'))
+    ->condition('name', 'entity_note_%')
+    ->execute();
+  
+  // Iterate the variables, and delete them
+  foreach ($rs->fetchCol() as $varname) {
+    variable_del($varname);
+  }
+  
+  // Clear the entity bundle information.
+  field_attach_delete_bundle('entity_note', 'entity_note');
+}
+
+/**
+ * Implements HOOK_schema().
+ */
+function entity_note_schema() {
+  $schema['entity_notes'] = array(
+    'description' => '',
+    'fields' => array(
+      'enid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'entity_type' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+      ),
+      'entity_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'thread' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'parent' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'subject' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'ip' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('enid'),
+    'indexes' => array(
+      'entity' => array('entity_type', 'entity_id', 'thread'),
+    ),
+    'foreign keys' => array(
+      'author' => array(
+        'table' => 'users',
+        'columns' => array('uid' => 'uid'),
+      ),
+    ),
+  );
+  
+  return $schema;
+}

@@ -1,0 +1,13 @@
+<?php
+/**
+ * @file
+ * Contains the SimpleTest class which tests the iwNodeWriter functionality.
+ */
+
+/**
+ * Unit test for validating the iwNodeWriter class.
+ * Tests that validation and persistence works correctly.
+ */
+class iwNodeWriterTestCase extends DrupalWebTestCase {
+  
+}

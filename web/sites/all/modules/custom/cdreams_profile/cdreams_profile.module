@@ -1,0 +1,666 @@
+<?php
+/**
+ * @file
+ * Core Drupal HOOKs and module file for cdreams_profile.
+ */
+
+define('CDREAMS_PROFILE_TITLE_NORMAL', 0);
+define('CDREAMS_PROFILE_TITLE_EMBED', 1);
+
+include_once 'cdreams_profile.xmlsitemap.inc';
+
+/**
+ * Implements HOOK_permission()
+ */
+function cdreams_profile_permission() {
+  // Note: Most of the administrative permissions use the node content permissions
+  // Ex. "Administer content types" => to manage profile types
+  $perms = array(
+    'cdreams_profile create profile'      => array('title' => 'Create new Common Dreams profiles'),
+    'cdreams_profile edit own profiles'   => array('title' => 'Edit <strong>own</strong> Common Dreams profiles'),
+    'cdreams_profile edit any profiles'   => array('title' => 'Edit <strong>any</strong> Common Dreams profiles'),
+    'cdreams_profile delete own profiles' => array('title' => 'Delete <strong>own</strong> Common Dreams profiles'),
+    'cdreams_profile delete any profiles' => array('title' => 'Delete <strong>any</strong> Common Dreams profiles'),
+  );
+
+  return $perms;
+}
+
+/**
+ * Implements HOOK_menu().
+ */
+function cdreams_profile_menu() {
+  $menu = array(
+    // ADMIN pages
+    'admin/structure/cdreams-profiles' => array(
+      'title' => 'Common Dreams Profiles',
+      'page callback' => 'cdreams_profile_types_overview_page',
+      'page arguments' => array('cdreams_profile_edit_type_form'),
+      'access arguments' => array('administer content types'),
+      'file' => 'pages/admin.inc',
+      'description' => 'Manage embeddable profile for Common Dreams articles.',
+    ),
+    'admin/structure/cdreams-profiles/add' => array(
+      'type' => MENU_LOCAL_ACTION,
+      'title' => 'Add profile type',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('cdreams_profile_edit_type_form'),
+      'access arguments' => array('administer content types'),
+      'file' => 'pages/admin.inc',
+    ),
+    'admin/structure/cdreams-profiles/manage/%cdreams_profile_type' => array(
+      'title' => 'Edit profile type',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('cdreams_profile_edit_type_form', 4),
+      'access arguments' => array('administer content types'),
+      'file' => 'pages/admin.inc',
+    ),
+    'admin/structure/cdreams-profiles/manage/%cdreams_profile_type/edit' => array(
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'title' => 'Edit',
+      'weight' => -10,
+    ),
+    'admin/structure/cdreams-profiles/%cdreams_profile_type/delete' => array(
+      'type' => MENU_CALLBACK,
+      'title' => 'Delete profile type',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('cdreams_profile_delete_type_confirm', 4),
+      'access arguments' => array('administer content types'),
+      'file' => 'pages/admin.inc',
+    ),
+
+    // Content management
+    'admin/content/cdreams-profiles' => array(
+      'type' => MENU_LOCAL_TASK,
+      'title' => 'Profiles',
+      'page callback' => '_cdreams_profile_content_overview_page',
+      'access arguments' => array('administer nodes'),
+      'file' => 'pages/manage_profiles.inc',
+    ),
+    'admin/content/cdreams-profiles/add' => array(
+      'type' => MENU_LOCAL_ACTION,
+      'title' => 'Add new profile',
+      'page callback' => array('_cdreams_profile_create_types_page'),
+      'access arguments' => array('cdreams_profile create profile'),
+      'file' => 'pages/manage_profiles.inc',
+    ),
+
+    // View page, in non-ajax incarnation.
+    'profile/nojs/%iwapi_entity_object/view' => array(
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'title' => 'View',
+      'weight' => -5,
+    ),
+  );
+
+  // CRUD pages
+  $has_ajax = array(
+    'profile/nojs/add/%cdreams_profile_type' => array(
+      'type' => MENU_CALLBACK,
+      'title' => 'Edit',
+      'page callback' => '_cdreams_profile_edit_page',
+      'page arguments' => array(3),
+      'access arguments' => array('cdreams_profile create profile'),
+      'file' => 'pages/manage_profiles.inc',
+    ),
+    'profile/nojs/%iwapi_entity_object' => array(
+      'load arguments' => array('cdreams_profile'),
+      'title callback' => 'iwapi_entity_label',
+      'title arguments' => array(2),
+      'page callback' => '_cdreams_profile_page',
+      'page arguments' => array(2),
+      'access callback' => '_iwapi_entity_access',
+      'access arguments' => array('view', 2),
+    ),
+    'profile/nojs/%iwapi_entity_object/edit' => array(
+      'type' => MENU_LOCAL_TASK,
+      'title' => 'Edit',
+      'load arguments' => array('cdreams_profile'),
+      'page callback' => '_cdreams_profile_edit_page',
+      'page arguments' => array(2),
+      'access callback' => '_iwapi_entity_access',
+      'access arguments' => array('edit', 2),
+      'file' => 'pages/manage_profiles.inc',
+    ),
+    'profile/nojs/%iwapi_entity_object/delete' => array(
+      'type' => MENU_CALLBACK,
+      'title' => 'Delete',
+      'load arguments' => array('cdreams_profile'),
+      'page callback' => '_cdreams_profile_delete_page',
+      'page arguments' => array(2),
+      'access callback' => '_iwapi_entity_access',
+      'access arguments' => array('delete', 2),
+      'file' => 'pages/manage_profiles.inc',
+    ),
+  );
+
+  iwapi_include('menu');
+  _iwapi_menu_add_ajax_items('cdreams_profile', $has_ajax, $menu);
+
+
+  if (module_exists('d6_importer')) {
+    $menu['admin/config/system/cdreams-import/clean-profiles'] = array(
+      'type' => MENU_LOCAL_TASK,
+      'title' => 'Clean Profiles',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('cdreams_profile_clear_all_profiles'),
+      'access arguments' => array('administer site configuration'),
+      'file' => 'pages/import.inc',
+    );
+  }
+
+  return $menu;
+}
+
+/**
+ * Implements HOOK_entity_info().
+ */
+function cdreams_profile_entity_info() {
+  $entity_info = array(
+    'label' => t('Profile Types'),
+    'base table'  => 'cdreams_profiles',
+    'fieldable'   => TRUE,
+    'searchable'  => TRUE,
+    'metatags'    => TRUE,
+    'bundle keys' => array('bundle' => 'type'),
+    'view modes'  => array(
+      'full' => array(
+        'label' => t('Full content'),
+        'custom settings' => FALSE,
+      ),
+      'teaser' => array(
+        'label' => t('Teaser'),
+        'custom settings' => FALSE,
+      ),
+      'embed' => array(
+        'label' => t('Embedded'),
+        'custom settings' => TRUE,
+      ),
+    ),
+  );
+
+  // Finalize the entity type information and report it to Drupal.
+  iwapi_include('entity');
+  _iwapi_populate_entity_info('cdProfileEntity', $entity_info);
+
+  foreach (cdreams_profile_type_load() as $type => $info) {
+    $entity_info['bundles'][$type] = array(
+      'label' => $info->label,
+      'admin' => array(
+        'path' => 'admin/structure/cdreams-profiles/manage/%cdreams_profile_type',
+        'real path' => 'admin/structure/cdreams-profiles/manage/'. strtr($type, '_', '-'),
+        'bundle argument' => 4,
+        'access callback' => 'user_access',
+        'access arguments' => array('administer content types'),
+      ),
+    );
+  }
+
+  return array('cdreams_profile' => $entity_info);
+}
+
+/**
+ * Implements HOOK_views_api().
+ */
+function cdreams_profile_views_api() {
+  $path = drupal_get_path('module', 'cdreams_profile');
+  return array('api' => 3, 'path' => $path .'/views');
+}
+
+/**
+ * Implements HOOK_path_alias_types()
+ */
+function cdreams_profile_path_alias_types() {
+  return array('profile' => t('Common Dreams Profile'));
+}
+
+/**
+ * Implements HOOK_pathauto()
+ */
+function cdreams_profile_pathauto($op = 'settings') {
+  if ($op == 'settings') {
+    $patterns = array();
+
+    foreach (cdreams_profile_type_load() as $type => $bundle) {
+      if ($bundle->has_page) {
+        $patterns[$type] = t('Pattern for all @name profile paths', array('@name' => $bundle->label));
+      }
+    }
+
+    // Return the properties needed to create auto-aliases for review content types.
+    return array(
+      (object) array(
+        'module'         => 'cdreams_profile',
+        'groupheader'    => t('Common Dreams profile paths'),
+        'patterndescr'   => t('Default item path pattern'),
+        'patterndefault' => '[cdreams_profile:name]',
+        'token_type'     => 'cdreams_profile',
+        'patternitems'   => $patterns,
+        'batch_update_callback' => 'cdreams_profile_pathauto_bulk_update_batch_process',
+        'batch_file' => drupal_get_path('module', 'cdreams_profile') . '/includes/batches.inc',
+      ),
+    );
+  }
+}
+
+/**
+ * Implements HOOK_forms().
+ */
+function cdreams_profile_forms($form_id, $args) {
+  $forms = array();
+
+  foreach (cdreams_profile_type_load() as $type => $info) {
+    $forms[$type .'_cdreams_profile_form']['callback'] = 'cdreams_profile_form';
+  }
+  return $forms;
+}
+
+/**
+ * Implements HOOK_field_extra_fields().
+ */
+function cdreams_profile_field_extra_fields() {
+  $extras = array();
+
+  // Always reset. If extra fields is being rebuilt something changed.
+  drupal_static_reset('_cdreams_profile_get_embed_fields');
+  foreach (_cdreams_profile_get_embed_fields() as $fieldname => $info) {
+    _cdreams_profile_add_extra_embeddable_fields($extras, $fieldname, $info);
+  }
+
+  // ------------
+  // Add the name field to the field / display settings.
+  foreach (cdreams_profile_type_load() as $type => $info) {
+    $extras['cdreams_profile'][$type]['form']['name'] = array(
+      'label' => 'Name',
+      'weight' => -10,
+      'description' => t('Profile name (title).'),
+    );
+
+    // Title is embeddable and thus can be moved around with display settings.
+    if ($info->title_display == CDREAMS_PROFILE_TITLE_EMBED) {
+      $extras['cdreams_profile'][$type]['display']['name'] = $extras['cdreams_profile'][$type]['form']['name'];
+    }
+
+    if (!empty($info->view)) {
+      $extras['cdreams_profile'][$type]['display']['integrated_view'] = array(
+        'label' => 'Integrated view',
+        'weight' => 99,
+        'description' => t('An included view which can be have a profile ID argument.'),
+      );
+    }
+  }
+
+  return $extras;
+}
+
+/**
+ * Implements HOOK_entity_view().
+ */
+function cdreams_profile_entity_view($entity, $type, $view_mode, $langcode) {
+  if ($type == 'cdreams_profile') {
+    return; // We do not embed profile fields into other profiles.
+  }
+  list($id, $rev, $bundle) = entity_extract_ids($type, $entity);
+
+  // Check for newswire organization URL.
+  $replTitle = FALSE;
+  $src = field_get_items($type, $entity, 'field_src_url');
+  if (!empty($src)) {
+    if ($bundle === 'newswire') {
+      $overrideTitle = 'embed_organization:title';
+    }
+    elseif (field_info_instance($type, 'field_src_profile', $bundle)) {
+      $overrideTitle = 'embed_src_profile:title';
+    }
+
+    if (!empty($overrideTitle)) {
+      $replTitle = empty($src[0]['title']) || preg_match('#^([a-z]{3,5}://|/)#i', $src[0]['title']);
+
+      $entity->content[$overrideTitle][0] = array(
+        '#type' => 'link',
+        '#title' => $src[0]['title'],
+        '#href' => $src[0]['url'],
+        '#options' => array(
+          'html' => isset($src[0]['html']) ? $src[0]['html'] : FALSE,
+          'attributes' => isset($src[0]['attributes']) ? $src[0]['attributes'] : array(),
+        ),
+      );
+    }
+  }
+
+  $embedded = _cdreams_profile_get_embed_fields();
+
+  // Go through and check for all embedded content.
+  foreach ($embedded as $fieldname => $info) {
+    $field = field_info_field($fieldname);
+
+    if ($items = field_get_items($type, $entity, $fieldname, $langcode)) {
+      array_walk($items, '_iwapi_extract_array_field', 'target_id');
+
+      $entities  = entity_load($field['settings']['target_type'], $items);
+      $titleKey  = 'embed_'. preg_replace('#^field_#', '', $fieldname) .':title';
+      $fillTitle = empty($entity->content[$titleKey][0]);
+
+      if (empty($entity->content[$titleKey])) {
+        $entity->content[$titleKey] = array();
+      }
+
+      $entity->content[$titleKey] += array(
+        '#type' => 'container',
+        '#attributes' => array('class' => array('profile-titles', 'clearfix')),
+      );
+
+      foreach ($entities as $id => $profile) {
+        $profile->embedFields($field, $entity);
+
+        if ($fillTitle) {
+          $uri = array();
+          $website = field_get_items('cdreams_profile', $profile, 'field_org_website');
+          if (empty($website)) {
+            $website = field_get_items('cdreams_profile', $profile, 'field_src_url');
+          }
+
+          $uri = empty($website[0]['url']) ? $profile->getUri() : array('path' => $website[0]['url']);
+          $uri['title'] = $profile->getLabel();
+
+          $prefix = '<span class="pb-byline" itemprop="author" itemscope itemtype="http://schema.org/Person">';
+          $prefix .= '<meta itemprop="url" content="' . url($uri['path'], ['absolute' => TRUE]) . '">';
+          $entity->content[$titleKey][] = array(
+            '#type' => 'link',
+            '#title' => '<span itemprop="name">' . $uri['title'] . '</span>',
+            '#href' => isset($uri) ? $uri['path'] : NULL,
+            '#options' => array(
+              'attributes' => array('target' => '_blank'),
+              'html' => TRUE,
+            ),
+            // Schema.
+            '#prefix' => $prefix,
+            '#suffix' => '</span>'
+          );
+        }
+        elseif ($replTitle) {
+          $entity->content[$titleKey][0]['#title'] = $profile->getLabel();
+          $entity->content[$titleKey][0]['#options']['html'] = FALSE;
+        }
+
+        $fillTitle = TRUE; // Only do this for the first round.
+        $entity->content[$titleKey][] = array(
+          '#markup' => '<span class="grouping-spacer">, </span>',
+        );
+      }
+
+      array_pop($entity->content[$titleKey]);
+    }
+  }
+}
+
+/**
+ * Implements HOOK_iwapi_entity_ajax_uri()
+ */
+function cdreams_profile_iwapi_entity_ajax_uri() {
+  return array(
+    'cdreams_profile' => array(
+      'create' => 'profile/ajax/add/%bundle',
+      'view'   => 'profile/ajax/%entity_id',
+      'edit'   => 'profile/ajax/%entity_id/edit',
+      'bundle_info_callback' => '_cdreams_profile_get_bundle_descriptions',
+    ),
+  );
+}
+
+/**
+ * Implements HOOK_theme().
+ */
+function cdreams_profile_theme(array $existing, $type, $theme, $path) {
+  return array(
+    // Add new item or line page, listing available types.
+    'cdreams_profile_add_list' => array(
+      'render element' => 'content',
+      'path' => $path .'/theme',
+      'file' => 'theme.inc',
+    ),
+  );
+}
+
+
+// ==============================
+// Menu / Load callbacks
+// ==============================
+
+/**
+ * Find bundle information for Common Dreams profiles.
+ *
+ * @param string $type
+ *  Machine name of bundle type to find the information for.
+ * @return <array|object|bool>
+ *  If $type is NULL, then return an array of all available
+ *  profile types. If $type is not null, then it should
+ *  be the machine name of the type to retrieve.
+ *
+ *  IFF the $type exists return object with bundle settings
+ *  otherwise return boolean FALSE.
+ */
+function cdreams_profile_type_load($type = NULL) {
+  $types = _cdreams_profile_types();
+
+  if (isset($type)) {
+    $type = strtr($type, '-', '_');
+    return key_exists($type, $types) ? $types[$type] : FALSE;
+  }
+  else {
+    return $types;
+  }
+}
+
+/**
+ * Page menu callback that renders the page view.
+ *
+ * @param cdProfileEntity $profile
+ *  The loaded profile object.
+ * @return array
+ *  Renderable array of content to display.
+ */
+function _cdreams_profile_page(cdProfileEntity $profile, $ajax = FALSE) {
+  $display = $profile->view('full');
+
+  if ($ajax) {
+    iwapi_include('ajax');
+
+    return array(
+      '#type' => 'ajax',
+      '#commands' => array(
+        iwapi_ajax_command_dialog(check_plain($profile->name), render($display), array('width' => 600)),
+        ajax_command_css('.author img', array('max-width' => '100%', 'height' => 'auto')),
+      ),
+    );
+  }
+  else {
+    $type = cdreams_profile_type_load($profile->type);
+
+    switch ($type->title_display) {
+      case CDREAMS_PROFILE_TITLE_EMBED:
+        global $hide_page_title;
+        $hide_page_title = TRUE;
+        break;
+
+      case CDREAMS_PROFILE_TITLE_NORMAL:
+      default:
+        // Do nothing special here.
+    }
+
+    drupal_set_title($profile->getLabel());
+    return $display;
+  }
+}
+
+
+// ==============================
+// Global utilities & helpers
+// ==============================
+
+/**
+ * Find all profile types currently available on
+ * the system.
+ *
+ * @param bool $rebuild
+ *  If TRUE, rebuild / find types from the database.
+ *  Otherwise check caches for relevant information.
+ */
+function _cdreams_profile_types($rebuild = FALSE) {
+  $cid = "cdreams_profile:types";
+
+  if (!$rebuild) {
+    $types = &drupal_static(__FUNCTION__);
+
+    if (isset($types)) {
+      return $types;
+    }
+    elseif ($cache = cache_get($cid)) {
+      return ($types = $cache->data);
+    }
+  }
+
+  if (!isset($types)) {
+    $query = db_select('cdreams_profile_types', 't')
+      ->fields('t')
+      ->orderBy('label', 'ASC')
+      ->execute();
+
+    $types = array();
+    foreach ($query as $type) {
+      $type->overrides = empty($type->overrides) ? array() : unserialize($type->overrides);
+
+      $types[$type->type] = $type;
+    }
+
+    cache_set($cid, $types);
+  }
+
+  return $types;
+}
+
+function _cdreams_profile_get_bundle_descriptions() {
+  $bundle_desc = array();
+
+  foreach (cdreams_profile_type_load() as $type => $info) {
+    $bundle_desc[$type] = array(
+      'label' => check_plain($info->label),
+      'description' => t(filter_xss_admin($info->description)),
+    );
+  }
+
+  return $bundle_desc;
+}
+
+/**
+ * Get the list of entity reference fields that
+ * contain profiles that can be embedded.
+ *
+ * @return array
+ *  Array of entityreference fields that refer to
+ *  cdreams_profile entities and what embed fields
+ *  are available.
+ *  Key is the entityreference field name and the
+ *  value is an array of embed fields.
+ */
+function _cdreams_profile_get_embed_fields() {
+  $embed = &drupal_static(__FUNCTION__);
+
+  if (isset($embed)) {
+    return $embed;
+  }
+  elseif ($cache = cache_get('cdreams_profile:embedded_fields')) {
+    $embed = $cache->data;
+  }
+
+  $embed = array();
+  foreach (field_info_field_map() as $fieldname => $info) {
+    if ($info['type'] !== 'entityreference') {
+      continue;
+    }
+
+    $field = field_info_field($fieldname);
+
+    // Add the embeddable fields allowed by this bundle.
+    if ($field['settings']['target_type'] === 'cdreams_profile') {
+      $target_bundles = isset($field['settings']['handler_settings']['target_bundles'])
+        ? $field['settings']['handler_settings']['target_bundles'] : array();
+
+      $embed[$fieldname] = array();
+      foreach ($target_bundles as $bundle) {
+        $embed[$fieldname] += cdProfileEntity::GetEmbeds($fieldname, $bundle);
+      }
+    }
+  }
+
+  cache_set('cdreams_profile:embedded_fields', $embed);
+  return $embed;
+}
+
+/**
+ * Helper function to parse field information in order to determine
+ * profile items embeddable by this entityreference and alter the
+ * $extras array with data in the HOOK_field_extra_fields() format.
+ *
+ * @param array $extras
+ *  Reference to array, to add the extra field information to.
+ * @param array $field
+ *  Field definition as returned by field_info_field().
+ * @return array
+ *  Information about all embeddable fields included by
+ *  the $field variable.
+ */
+function _cdreams_profile_add_extra_embeddable_fields(array &$extras, $field, array $embed) {
+  $fmap = field_info_field_map();
+  $prefix = 'embed_'. preg_replace('#^field_#', '', $field) .':';
+  $fieldBundles = $fmap[$field]['bundles'];
+
+  unset($fieldBundles['cdreams_profile']); // No profiles embedded into profiles.
+
+  foreach ($fieldBundles as $entType => $bundles) {
+    foreach ($bundles as $bundle) {
+      $inst = field_info_instance($entType, $field, $bundle);
+      $label_prefix = $inst['label'] .': ';
+      $extra_embeds = array();
+
+      foreach ($embed as $data) {
+        $extra_embeds[$data['dst']] = array(
+          'label' => $label_prefix . $data['label'],
+          'weight' => $inst['display']['default']['weight'] + 1,
+          'description' => t('Embedded profile field %label', array('%label' => $inst['label'])),
+        );
+      }
+
+      $extra_embeds[$prefix .'title'] = array(
+        'label' => $label_prefix .'title',
+        'weight' => $inst['display']['default']['weight'],
+        'description' => 'The profile name / title.',
+      );
+
+      if (empty($extras[$entType][$bundle]['display'])) {
+        $extras[$entType][$bundle]['display'] = $extra_embeds;
+      }
+      else {
+        $extras[$entType][$bundle]['display'] += $extra_embeds;
+      }
+    }
+  }
+}
+
+/**
+ * Get a list of prepared imports provided by this module.
+ * Can be used by other modules to provide an import.
+ *
+ * @return array
+ *  Lists array of possible imports provided by the
+ *  profiles module. Key is the file path, and values
+ *  are the human / presentable name.
+ */
+function _cdreams_profile_list_imports() {
+  $basePath = drupal_get_path('module', 'cdreams_profile') .'/import';
+  return array(
+    "$basePath/author.inc"       => t('Author profiles'),
+    "$basePath/source.inc"       => t('Source information'),
+    "$basePath/organization.inc" => t('Organization information'),
+  );
+}

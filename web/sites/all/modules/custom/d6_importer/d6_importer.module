@@ -1,0 +1,20 @@
+<?php
+/**
+ * @file
+ * Core Drupal HOOKs and global utilities.
+ */
+
+
+/**
+ * Implements HOOK_entity_delete()
+ */
+function d6_importer_entity_delete($entity, $type) {
+  list($id) = entity_extract_ids($type, $entity);
+  
+  // Remove lookup entries that are no longer valid.
+  // Will prevent reference look-ups that no longer exists.
+  db_delete('d6_importer_lookup')
+    ->condition('entity_type', $type)
+    ->condition('id', $id)
+    ->execute();
+}

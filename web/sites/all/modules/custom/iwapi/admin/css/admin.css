@@ -1,0 +1,15 @@
+
+
+table tr.add-new-item td {
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+table tr.add-new-item td.row-actions {
+  vertical-align: middle;
+}
+
+td .add-new-placeholder {
+  font-weight: bold;
+  padding: 2px 4px 0;
+}

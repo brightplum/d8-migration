@@ -1,0 +1,49 @@
+﻿// Override Mondrian Panel Style
+// Set breakpoint values.
+$phone : 576px;
+$tab   : 768px;
+$desk  : 1024px;
+$large : 1260px;
+
+.pane-further {
+    width: 100%;
+    display: inline;
+    background-color: $color_bg_blue;
+    min-height: 430px;
+    @include breakpoint($phone) {
+        width: 48%;
+        margin-right: 4%;
+        float: left;
+    }
+
+    h2 {
+        margin-left: 4%;
+        margin-right: 4%;
+        width: 92% !important;
+    }
+
+    .view {
+        margin-left: 4%;
+        margin-right: 4%;
+        width: 92% !important;
+
+        .view-content {
+            border: none;
+            .views-field-field-hp-title {
+                @extend .article-title;
+            }
+            .views-field-field-image {
+                margin: 10px 0 10px 0;
+            }
+        }
+    }
+}
+
+.field--name-field-article-date  {
+  font-family: $font_condensed;
+  font-size: 14px;
+  font-style: italic;
+  //margin-bottom: 5px;
+  
+  p { margin: 0; }
+}

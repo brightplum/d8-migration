@@ -1,0 +1,48 @@
+﻿
+.view-views-articles {
+  .views-row {
+    padding: 10px 0;
+    margin-bottom: 10px;
+
+    .views-field-field-image,
+    .views-field-field-profile-img {
+      float: left;
+      padding-right: 0.5rem;
+
+      @include breakpoint($tab) {
+        padding-right: 0.5rem;
+      }
+
+      img {
+        width: 100%;
+      }
+
+      i.fa-user {
+        width: 65px;
+        color: #aaa;
+        font-size: 65px;
+        text-align: center;
+      }
+    }
+    .views-field-field-image {
+      width: 50%;
+      max-width: 120px;
+    }
+
+    .views-field-field-hp-author,
+    .views-field-field-hp-title,
+    .views-field-title-1 {
+      font-family: $font_sans;
+      font-size: 14px;
+      color: $color_body;
+      a {
+        color: $color_links;
+      }
+    }
+    .views-field-title {
+      font-family: $font_sans;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+  }
+}

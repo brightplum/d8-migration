@@ -1,0 +1,83 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the ctas module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function ctas_schema() {
+  $schema['ctas'] = array(
+    'description' => 'Stores data specific for the CTA enabled blocks.',
+    'fields' => array(
+      'cta_id' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique CTA ID.',
+      ),
+      'bid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'description' => 'Block bid.',
+      ),
+      'module' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => "The module from which the block originates; for example, 'user' for the Who's Online block, and 'block' for any custom blocks.",
+      ),
+      'delta' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '0',
+        'description' => 'Unique ID for block within a module.',
+      ),
+      'status' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+        'description' => 'Block enabled status. (1 = enabled, 0 = disabled)',
+      ),
+      'display' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => "The display option for this CTA.",
+      ),
+      'options' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'serialize' => TRUE,
+        'size' => 'big',
+        'description' => 'Display options',
+      ),
+      'impressions' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'big',
+        'description' => 'Number of times the CTA is shown',
+      ),
+      'clicks' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'big',
+        'description' => 'Number of times the CTA was clicked.',
+      ),
+    ),
+    'primary key' => array('module', 'delta'),
+    'indexes' => array(
+      'cta_id' => array('cta_id')
+    ),
+  );
+
+  return $schema;
+}

@@ -1,0 +1,53 @@
+
+.ui-front { z-index: 600; }
+
+
+/* Manage the canvas.
+ ----------------------*/
+#content-canvas {
+  margin-bottom: 1em;
+}
+
+#content-canvas .content-slot {
+  position: relative;
+  background: #ccc;
+  padding: 3px 3px;
+  margin-bottom: 5px;
+}
+
+#content-canvas .content-slot.has-header { padding-top: 14px; }
+
+#content-canvas .content-container {
+  border: 2px dashed #999;
+  min-height: 75px;
+}
+
+#builder-tools {
+  background: #ccc;
+  min-height: 100px;
+}
+
+.section-header {
+  position: absolute;
+  font-weight: bold;
+  top: 2px;
+  left: 2px;
+  padding-left: 8px;
+}
+
+#edit-unused-fields img,
+#unused-fields img {
+  display: none;
+}
+
+#edit-unused-fields .ui-state-disabled { opacity: 1; }
+#edit-unused-fields .ui-droppable {
+  height: 400px;
+  overflow-y: scroll;
+}
+
+#content-canvas .day-1 { background-color: #c8c; }
+#content-canvas .day-2 { background-color: #8b8; }
+#content-canvas .day-3 { background-color: green; }
+#content-canvas .day-4 { background-color: #c09853; }
+#content-canvas .day-5 { background-color: #027ac6; }

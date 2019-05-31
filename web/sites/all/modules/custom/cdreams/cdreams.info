@@ -1,0 +1,17 @@
+;
+; Developer: Image Works (http://www.imagewks.com)
+;
+; Author(s): Liem Khuu   (liem@imagewks.com)
+;            Neil Arnold (neil@imagewks.com)
+; ==========================================
+
+name = Common Dreams
+package = Common Dreams
+description = Core customizations and settings module.
+
+php = 5.3
+core = 7.x
+version = 7.x-0.9
+
+
+dependencies[] = iwapi

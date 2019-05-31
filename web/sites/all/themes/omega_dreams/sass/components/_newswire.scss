@@ -1,0 +1,147 @@
+$phone : 576px;
+$tab   : 768px;
+$desk  : 1024px;
+$large : 1260px;
+
+.pane-newswire {
+  width: 100%;
+  display: inline;
+  background-color: $color_bg_blue;
+  min-height: 430px;
+  font-family: $font_sans;
+  @include breakpoint($phone) {
+    width: 48%;
+    margin-right: 4%;
+    float: left;
+  }
+
+  h2 {
+    margin-left: 4%;
+    margin-right: 4%;
+    width: 92% !important;
+  }
+
+  .view {
+    margin-left: 4%;
+    margin-right: 4%;
+    width: 92% !important;
+
+    .view-content {
+      border: none;
+      font-family: $font_sans;
+
+      .views-row {
+        margin-bottom: 20px;
+
+        .views-field-field-override-org {
+          font-family: $font_sans;
+          font-size: 14px;
+          a { color: $color_body; }
+        }
+
+        .views-field-title {
+          @extend .article-title;
+        }
+      }
+    }
+  }
+}
+
+.view-newswire.view-display-id-article_display_page {
+    
+  .views-field-name,
+  .views-field-field-organization {
+    font-size: 0.9em;
+    color: #999999;
+  }
+
+  .views-row {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: solid 1px #cccccc;
+
+    .views-field-created {
+      padding-bottom: 4px;
+    }
+
+    .views-field-name,
+    .views-field-field-organization {
+      font-size: 0.9em;
+      color: #999999;
+    }
+
+    .views-field-field-hp-title {
+      @extend .article-title;
+    }
+  }
+}
+
+.node--newswire {
+  h1 {
+    text-align: center;
+  }
+  #field-wrapper-article-content {
+    border: 1px solid #e1e1e1;
+    padding: 10px;
+  }
+  
+  #field-wrapper-org-links,
+  #field-wrapper-org-contact {
+    font-family: $font_sans;
+  }
+  
+  .newswire-end {
+    text-align: center;
+  }
+  
+  .field--name-field-desc {
+    font-style: italic;
+  }
+}
+
+%bare-wrapper-title {
+    border: none;
+    color: $color_body;
+    width: auto;
+    font-size: 16px;
+
+    &:after {
+      border: none;
+      width: auto;
+    }
+}
+
+#field-wrapper-org-info .field-wrapper {
+  h3.field-wrapper-title {
+    @extend %bare-wrapper-title;
+    
+    &.inline {
+      @include inline-block;
+      vertical-align: baseline;
+      padding-bottom: 0;
+    }
+  }
+  
+  .profile-titles {
+    @include inline-block;
+    vertical-align: baseline;
+  }
+  
+  .field--name-field-contact-info p {
+    margin-top: 0.25em;
+    margin-bottom: 0.75em;
+  }
+}
+
+#field-wrapper-org-links {    
+  border: 1px solid #e1e1e1;
+  padding: 0.25em 0.5em 0.75em;
+  
+  h3.field-wrapper-title { @extend %bare-wrapper-title; }
+ 
+  .field {
+    float: left;
+    width: 33%;
+    text-align: center;
+  }
+}

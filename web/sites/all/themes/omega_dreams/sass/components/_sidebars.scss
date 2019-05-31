@@ -1,0 +1,92 @@
+
+.l-region--sidebar-second,
+.mondrian-region--secondary {
+  .block,
+  .panel-pane {
+    background-color: $color_bg_sidebar;
+    padding: 10px;
+    margin: 0 0 20px 0;
+    
+    h2 {
+      font-family: $font_sans;
+      color: $color_title;
+      font-size: 24px;
+      font-weight: bold;
+      margin: 0 0 10px 0;		
+    }
+  }
+}
+
+.view-special-coverage {
+  .view-content {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.view-id-most_popular {
+  .views-field-field-image {
+    min-width: 100px;
+    padding: 0 20px 20px 0;
+  }
+
+  .views-field-type {
+    padding: 0 0px 20px 0;
+    font-size: 14px;
+  }
+}
+
+
+.view-display-id-block_todays_top_news {
+  .views-field-field-image,
+  .views-field-field-article-img {
+    min-width: 100px;
+    padding: 0 20px 20px 0;
+  }
+  .views-field-field-hp-title {
+    padding: 0 0px 20px 0;
+    font-family: $font_sans;
+    font-size: 14px;
+  }
+}
+
+// Salsa Subscribe Box --- --- ---
+.newsletter-form {
+  input[type=text] {
+    height: 30px;
+    width: 100%;
+  }
+
+  input[type=submit] { }
+}
+// END - Salsa Subscribe Box --- --- ---
+
+
+// Social Media Icons --- --- ---
+.sidebar-social {
+  font-size: 24px;
+  font-weight: bold;
+  color: $color_title;
+  position: relative;
+  line-height: 1em;
+
+  a { 
+    font-size: 40px;
+    color: $color_title; 
+    display: inline-block;
+    margin-left: 20px;
+    margin-bottom: 8px;
+    position: relative;
+    top: 5px;
+    .fa-facebook-square { color: #3b5998; }
+    .fa-twitter-square { color: #00aced; }
+    .fa-rss-square { color: #fa9d39; }
+    .fa-envelope  { color: #00aced; }
+  }
+}
+// END - Social Media Icons --- --- ---
+
+.no-box {
+    padding: 0px !important;
+    background-color: #ffffff !important;
+}

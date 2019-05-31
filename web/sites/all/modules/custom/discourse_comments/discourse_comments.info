@@ -1,0 +1,16 @@
+name = Discourse Comments
+package = Common Dreams
+description = Allows Common Dreams website to include Discourse forum discussions.
+
+php = 5.3
+core = 7.x
+version = 7.x-0.9
+
+dependencies[] = iwapi
+
+
+; Files
+; ---------------
+files[] = lib/DiscourseTransaction.inc
+files[] = lib/DiscourseRequest.inc
+files[] = lib/DiscoursePost.inc

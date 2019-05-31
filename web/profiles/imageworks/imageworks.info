@@ -1,0 +1,29 @@
+;
+; Developer: Image Works (http://www.imagewks.com)
+;
+; Author(s): Liem Khuu   (liem@imagewks.com)
+;            Neil Arnold (neil@imagewks.com)
+; ==========================================
+
+name = Image Works Basic
+description = Basic installation profile, which supports common settings.
+
+core = 7.x
+version = "7.x-0.9"
+
+
+dependencies[] = dblog
+
+dependencies[] = iwapi
+dependencies[] = devel
+dependencies[] = date
+dependencies[] = date_api
+dependencies[] = ctools
+dependencies[] = views
+dependencies[] = backup_migrate
+dependencies[] = pathauto
+dependencies[] = field_formatter_settings
+dependencies[] = backup_migrate
+dependencies[] = redirect
+dependencies[] = token
+dependencies[] = transliteration

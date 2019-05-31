@@ -1,0 +1,37 @@
+
+.panel-display,
+.node {	// keep this from other parts of the site like menus
+	.pane-block,
+    .views-field-body,
+	.field--name-body {
+		ul {
+			li {
+				list-style-type: none;
+				padding: 0 0 5px 0;
+				&:before {    
+					content: '\f054';
+					font-family: FontAwesome;
+					color: $color_accent;
+					margin:0 6px 0 -15px;
+				} // :before
+			} // li
+		} // ul
+	} // .field--name-body 
+} // .l-main
+
+
+// Override Shareaholic List
+.shareaholic-canvas {
+	.shareaholic-share-buttons-container .shareaholic-share-buttons-wrapper {
+	  display: inline !important;
+	}
+	.shareaholic-share-buttons-container ul.shareaholic-share-buttons {
+	  margin: 0 !important;
+	  padding: 0 !important;
+	}
+	.shareaholic-share-buttons-container li.shareaholic-share-button {
+	  margin: 0 10px 0 0 !important;
+	  padding:  0 !important;
+	}
+}
+// END - Override Shareaholic List

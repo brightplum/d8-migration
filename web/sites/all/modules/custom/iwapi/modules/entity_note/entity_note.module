@@ -1,0 +1,596 @@
+<?php
+/**
+ * @file
+ * Core module file, with a majority of the HOOKs and global functionality.
+ */
+
+// Notes display types.
+define('ENTITY_NOTE_DISPLAY_DISABLED', 0);
+define('ENTITY_NOTE_DISPLAY_THREADED', 1);
+define('ENTITY_NOTE_DISPLAY_FLAT', 2);
+
+// Permission definitions
+define('ENTITY_NOTE_PERM_ADMIN',  'administer entity notes');
+define('ENTITY_NOTE_PERM_CREATE', 'create entity_notes');
+define('ENTITY_NOTE_PERM_EDIT',   'edit own entity_notes');
+define('ENTITY_NOTE_PERM_DELETE', 'delete own entity_notes');
+
+
+// =====================================
+// Drupal core HOOKs
+// =====================================
+
+/**
+ * Implements HOOK_permission().
+ */
+function entity_note_permission() {
+  return array(
+    ENTITY_NOTE_PERM_ADMIN => array(
+      'title' => t('Administer entity notes and displays'),
+      'restrict access' => TRUE,
+    ),
+    ENTITY_NOTE_PERM_CREATE => array('title' => t('User can create new notes / comments')),
+    ENTITY_NOTE_PERM_EDIT   => array('title' => t('User can edit own notes / comments')),
+    ENTITY_NOTE_PERM_DELETE => array('title' => t('User can delete own notes / comments')),
+  );
+}
+
+/**
+ * Implements HOOK_menu().
+ */
+function entity_note_menu() {
+  $menu = array(
+    'admin/structure/entity-note' => array(
+      'title' => 'Entity notes',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('entity_note_admin_settings'),
+      'access arguments' => array(ENTITY_NOTE_PERM_ADMIN),
+      'description' => 'Adjust fields and behaviors of entity notes (comments).',
+      'file' => 'entity_note.admin.inc',
+    ),
+    'admin/structure/entity-note/settings' => array(
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'title' => 'Settings',
+      'weight' => 0,
+    ),
+  );
+  
+  $menu['entity-note/add/ajax/%/%iwapi_entity_object'] = array(
+    'type' => MENU_CALLBACK,
+    'title' => 'Add comment',
+    'load arguments' => array(3),
+    'delivery callback' => 'ajax_deliver',
+    'page callback' => '_entity_note_add_page',
+    'page arguments' => array(4, 3),
+    'access callback' => '_entity_note_create_access',
+    'access arguments' => array(4, 3),
+    'theme callback' => 'ajax_base_page_theme',
+    'file' => 'entity_note.pages.inc',
+  );
+  
+  // Allow notes edit, replies and delete to come in either AJAX or without JS.
+  $has_ajax['entity-note/edit/nojs/%entity_note'] = array(
+    'type' => MENU_CALLBACK,
+    'title' => 'Edit comment',
+    'page callback' => '_entity_note_edit_page',
+    'page arguments' => array(3),
+    'access callback' => '_iwapi_entity_access',
+    'access arguments' => array('edit', 3),
+    'file' => 'entity_note.pages.inc',
+  );
+  
+  $has_ajax['entity-note/reply/nojs/%entity_note'] = array(
+    'type' => MENU_CALLBACK,
+    'title' => 'Reply to comment',
+    'page callback' => '_entity_note_reply_page',
+    'page arguments' => array(3),
+    'access arguments' => array(ENTITY_NOTE_PERM_CREATE),
+    'file' => 'entity_note.pages.inc',
+  );
+  
+  // Allow AJAX handling of note deletion.
+  $has_ajax['entity-note/delete/nojs/%entity_note'] = array(
+    'type' => MENU_CALLBACK,
+    'title callback' => 'iwapi_entity_label',
+    'title arguments' => array(3),
+    'page callback' => '_entity_note_delete_page',
+    'page arguments' => array(3),
+    'access callback' => '_iwapi_entity_access',
+    'access arguments' => array('delete', 3),
+    'file' => 'entity_note.pages.inc',
+  );
+  
+  // Resolve the AJAX menu items.
+  iwapi_include('menu');
+  _iwapi_menu_add_ajax_items('entity_note', $has_ajax, $menu);
+  
+  return $menu;
+}
+
+/**
+ * Implements HOOK_views_api().
+ */
+function entity_note_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'entity_note') .'/views',
+  ); 
+}
+
+/**
+ * Implements HOOK_entity_info().
+ */
+function entity_note_entity_info() {
+  $entities['entity_note'] = array(
+    'fieldable' => TRUE,
+    'label' => t('Entity note'),
+    'entity class' => 'NoteEntity',
+    'controller class' => 'iwEntityController',
+    'view modes' => array(
+      'preview' => array(
+        'label' => t('Teaser'),
+        'custom settings' => TRUE,
+      ),
+      'full' => array(
+        'label' => t('Full'),
+        'custom settings' => FALSE,
+      ),
+    ),
+    'bundles' => array(
+      'entity_note' => array(
+        'label' => t('Entity Notes'),
+        'admin' => array(
+          'path' => 'admin/structure/entity-note',
+          'access arguments' => array(ENTITY_NOTE_PERM_ADMIN),
+        ),
+      ),
+    ),
+  );
+  
+  iwapi_include('entity');
+  foreach ($entities as $type => &$info) {
+    try {
+      _iwapi_populate_entity_info($info['entity class'], $info);
+    }
+    catch (Exception $e) {
+      // If there were any issues with a specific entity, remove it and keep going.
+      unset($entities[$type]);
+      watchdog_exception('entity_note', $e);
+    }
+  }
+  unset($info);
+  
+  return $entities;
+}
+
+/**
+ * Implements HOOK_entity_delete().
+ */
+function entity_note_entity_delete($entity, $type) {
+  list($id, $rev, $bundle) = entity_extract_ids($type, $entity);
+  
+  // Remove all entity notes attached to this entity.
+  $queue = DrupalQueue::get('iwapi_entity_clear');
+  $queue->createItem(array(
+    'entity_type' => 'entity_note',
+    'conditions' => array(
+      array('field' => 'entity_type', 'value' => $type),
+      array('field' => 'entity_id', 'value' => $id),
+    ),
+  ));
+}
+
+/**
+ * Implements HOOK_field_attach_rename_bundle().
+ */
+function entity_note_field_attach_rename_bundle($entity_type, $bundle_old, $bundle_new) {
+  if ($settings = variable_get("entity_note_{$type}__{$bundle_old}", NULL)) {
+    variable_set("entity_note_{$type}__{$bundle_new}", $settings);
+    variable_del("entity_note_{$type}__{$bundle_old}");
+  }
+}
+
+/**
+ * Implements HOOK_user_delete().
+ */
+function entity_note_user_delete($account) {
+  // Alter all comments by the deleted account to be from
+  db_update('entity_notes')
+    ->fields(array('uid' => 0))
+    ->condition('uid', $account->uid)
+    ->execute();
+}
+
+/**
+ * Implements HOOK_field_extra_fields().
+ */
+function entity_note_field_extra_fields() {
+  $extras = array();
+  
+  // Iterate through the supported entity types and add the
+  // the notes as a configurable / movable field.
+  foreach (_entity_note_get_supported_types() as $type) {
+    $info = entity_get_info($type);
+    
+    foreach ($info['bundles'] as $bundle => $info) {
+      $extras[$type][$bundle]['display'] = array(
+        'entity_notes' => array(
+          'label' => t('Entity notes (comments)'),
+          'description' => t('Allows the display of threaded notes for an entity.'),
+          'weight' => 50,
+        ),
+      );
+    }
+  }
+  return $extras;
+}
+
+/**
+ * Implements HOOK_entity_view().
+ */
+function entity_note_entity_view($entity, $type, $view_mode, $langcode = NULL) {
+  // not the correct type or not displaying as a page
+  if (!($entity instanceof iwEntity) || $entity instanceof NoteEntity) {
+    return;
+  }
+  
+  list($id, $rev, $bundle) = entity_extract_ids($type, $entity);
+  $settings = _entity_note_get_note_settings($type, $bundle);
+  
+  if ($entity->isPage() || key_exists($view_mode, $settings['show_modes'])) {
+    $entity->content['entity_notes'] = _entity_note_get_display($type, $id, $settings);
+  }
+  elseif (!(empty($settings['display']) || $settings['display'] == ENTITY_NOTE_DISPLAY_DISABLED)) {      
+    $entity->content['entity_notes'] = array(
+      '#prefix' => '<div class="notes-count">',
+      '#suffix' => '</div>',
+      '#markup' => format_plural(_entity_note_get_count($type, $id), '1 comment', '@count comments'),
+    );
+  }
+}
+
+/**
+ * Implements HOOK_entity_bundle_form_alter().
+ *
+ * This allows us to modify entity bundle settings, and add
+ * additional settings to any forms that support this.
+ */
+function entity_note_entity_bundle_form_alter(&$form, &$form_state, $context) {
+  $types = _entity_note_get_supported_types();
+
+  if (isset($types[$form_state['entity_type']])) {
+    $entity_info = entity_get_info($form_state['entity_type']);
+
+    $type     = $form_state['entity_type'];
+    $bundle   = $form_state['bundle'];
+    $form_id  = $form_state['build_info']['form_id'];
+    $settings = _entity_note_get_note_settings($type, $bundle);
+
+    $page_sizes = range(20, 50, 5);
+    $form['entity_note'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Entity notes'),
+      '#group' => 'additional_settings',
+      '#tree' => TRUE,
+      
+      'enabled' => array(
+        '#type' => 'checkbox',
+        '#title' => t('Open entity notes (comments)'),
+        '#default_value' => $settings['enabled'],
+        '#description' => t(
+          'This dictates if additional comments can be added. If comments '.
+          'already exist, they will still display based on the display '.
+          'settings below. To hide comments set display to "Hidden"'
+        ),
+      ),
+      'display' => array(
+        '#type' => 'select',
+        '#title' => t('Display as'),
+        '#options' => array(
+          ENTITY_NOTE_DISPLAY_DISABLED => t('Hidden'),
+          ENTITY_NOTE_DISPLAY_FLAT     => t('Flat'),
+          ENTITY_NOTE_DISPLAY_THREADED => t('Threaded'),
+        ),
+        '#default_value' => $settings['display'],
+      ),
+      'page_size' => array(
+        '#type' => 'select',
+        '#title' => t('Number of notes to display on a page.'),
+        '#options' => array_combine($page_sizes, $page_sizes),
+        '#default_value' => $settings['page_size'],
+      ),
+      'show_modes' => array(
+        '#type' => 'checkboxes',
+        '#title' => t('Show full comments in'),
+        '#options' => _iwapi_extract_field($entity_info['view modes']),
+        '#default_value' => $settings['show_modes'],
+      ),
+    );
+    
+    $callback = $form_id .'_submit';
+    if (empty($form['#submit']) && function_exists($callback)) {
+      $form['#submit'] = array($callback);
+    }
+    
+    $form['#submit'][] = '_entity_note_entity_bundle_form_submit';
+  }
+}
+
+/**
+ * Submit callback that saves the entity note settings for the
+ * given bundle and data.
+ */
+function _entity_note_entity_bundle_form_submit($form, &$form_state) {
+  $type   = $form_state['entity_type'];
+  $bundle = $form_state['bundle'];
+  $values = $form_state['values']['entity_note'];
+  
+  $values['show_modes'] = array_filter($values['show_modes']);
+  _entity_note_set_note_settings($type, $bundle, $values);
+}
+
+/**
+ * Implements HOOK_theme().
+ */
+function entity_note_theme($existing, $type, $theme, $path) {
+  return array(
+    'entity_note' => array(
+      'render element' => 'element',
+      'template' => 'entity-note',
+      'pattern' => 'entity_note__',
+      'path' => $path .'/theme',
+      'file' => 'theme.inc',
+    ),
+  );
+}
+
+
+// ===============================
+// Menu callbacks
+// ===============================
+
+/**
+ * Menu load callback to load a entity_note by
+ * {entity_notes}.enid
+ * 
+ * @param int $id
+ *  Single entity ID for the note to load.
+ * @return NoteEnity
+ *  Loaded NoteEntity object if available, otherwise
+ *  FALSE is returned for not found.
+ */
+function entity_note_load($id) {
+  $notes = entity_load('entity_note', array($id));
+  return reset($notes);
+}
+
+/**
+ * Check if user has access to view and comment
+ * on this particular entity.
+ * 
+ * @param iwEntity $entity
+ *  The entity to check view permissions for.
+ * @param string $type
+ *  The machine name of the entity type.
+ * @return bool
+ *  TRUE iff user has access to view entity and create
+ *  comments, FALSE otherwise.
+ */
+function _entity_note_create_access(iwEntity $entity, $type, $account = NULL) {
+  global $user;
+  
+  if (!isset($account)) {
+    $account = $user;
+  }
+  
+  if (user_access(ENTITY_NOTE_PERM_CREATE, $account)) {
+    return $entity->checkAccess('view', $account);
+  }
+  
+  return FALSE;
+}
+
+
+// ====================================
+// Global utilities
+// ====================================
+
+
+/**
+ * Get the number of comments that are linked to
+ * a entity (by ID and type).
+ * 
+ * @param string $type
+ *  Machine name of the entity type to find comments for.
+ * @param int $id
+ *  The integer value to use for the ID of this entity.
+ * @return int
+ *  The number of comments that are linked to this entity.
+ */
+function _entity_note_get_count($type, $id) {
+  $query = db_select('entity_notes', 'note')
+    ->condition('entity_type', $type)
+    ->condition('entity_id', $id)
+    ->condition('status', IWAPI_ACTIVE);
+  
+  $query->addExpression('COUNT(1)');
+  return $query->execute()->fetchField();
+}
+
+/**
+ * Fetch the entity note display of items for an entity.
+ * This function does check if notes are setup to display.
+ * 
+ * @param string $type
+ *  Machine name of the entity type.
+ * @param int $id
+ *  ID of the entity of $type to fetch notes for.
+ * @param array $settings
+ *  Settings that help determine how the notes should display.
+ * @param bool $include_create
+ *  Include a form to allow additional comments?
+ * @return array | NULL
+ *  If comment display is allowed then return a renderable
+ *  array of entity notes. NULL is returned if displaying
+ *  fails for any reason (IE disable or unknown display setting).
+ */
+function _entity_note_get_display($type, $id, $settings, $include_create = TRUE) {
+  if (empty($settings['display']) || $settings['display'] == ENTITY_NOTE_DISPLAY_DISABLED) {
+    return NULL;
+  }
+
+  $query = db_select('entity_notes', 'note')
+    ->condition('entity_type', $type)
+    ->condition('entity_id', $id)
+    ->condition('status', IWAPI_ACTIVE);
+ 
+  $query->addField('note', 'enid');
+  
+  // Add the notes display to the page display
+  if ($settings['display'] == ENTITY_NOTE_DISPLAY_FLAT) {
+    $query->orderBy( 'ASC');
+  }
+  elseif ($settings['display'] == ENTITY_NOTE_DISPLAY_THREADED) {
+    $query->addExpression('SUBSTRING(note.thread, 1, (LENGTH(note.thread) - 1))', 'torder');
+    $query->orderBy('torder', 'ASC');
+  }
+  else {
+    return NULL;
+  }
+  
+  // Build the shell where all the retrieved comments will live.
+  $content = array(
+    '#theme_wrappers' => array('container'),
+    '#attributes' => array('class' => array('comments-wrapper', 'clearfix')),
+
+    'title' => array(
+      '#type' => 'html_tag',
+      '#tag' => 'h3',
+      '#value' => t('Comments'),
+      '#attributes' => array('class' => array('notes-title')),
+    ),
+  );
+      
+  // Check if user is able to create comments.
+  if ($include_create && user_access(ENTITY_NOTE_PERM_CREATE)) {
+    require_once __DIR__ .'/entity_note.pages.inc';
+    
+    global $user;
+ 
+    // Create a new note set to link with this entity.
+    $note = new NoteEntity(array(
+      'entity_type' => $type,
+      'entity_id' => $id,
+      'uid' => $user->uid,
+    ));
+
+    $content['add_note'] = drupal_get_form('entity_note_edit_note', $note);
+    $content['add_note']['#attributes']['class'][] = 'add-entity-note';
+    
+    $content['#attached'] = array(
+      'library' => array(
+        array('iwapi', 'iwapi.ajax'),
+        array('system', 'jquery.form'),
+      ),
+      'js' => array(drupal_get_path('module', 'entity_note') .'/js/entity-note.js'),
+    );
+  }
+  
+  // Fetch the available notes that fit our criteria.
+  $query->extend('PagerDefault')->limit($settings['page_size']);
+  $notes = entity_load('entity_note', $query->execute()->fetchCol());
+  
+  // Iterate and build the views for each of the notes.
+  foreach ($notes as $enid => $note) {
+    if (empty($note->parent)) {
+      $content[$enid] = $note->view('full');
+    }
+    elseif (isset($notes[$note->parent])) {
+      // Attach to the reply parent.
+      $notes[$note->parent]->replies[$enid] = $note->view('full');
+    }
+    else {
+      $depth = count(explode('.', $note->thread)) - 1;
+      $display = $note->view('full');
+      
+      for ($i = 0; $i < $depth; ++$i) {
+        $display = array(
+          '#theme_wrappers' => array('container'),
+          '#attributes' => array('class' => 'indented'),
+          'content' => $display,
+        );
+      }
+
+      $content[$enid] = $display;
+    }
+  }
+    
+  return $content;
+}
+
+/**
+ * Find the entity types that support notes.
+ * 
+ * @return array
+ *  An array with the entity type names of
+ *  all the types which support
+ */
+function _entity_note_get_supported_types() {
+  static $types;
+
+  if (!isset($types)) {
+    if ($cache = cache_get('entity_note_types')) {
+      $types = $cache->data;
+    }
+    else {
+      $types = array();
+      foreach (entity_get_info() as $name => $info) {
+        if (!empty($info['notable']) && isset($info['entity class']) && is_subclass_of($info['entity class'], 'iwEntity')) {
+          $types[$name] = $name;
+        }
+      }      
+      cache_set('entity_note_types', $types);
+    }
+  }
+  return $types;
+}
+
+/**
+ * Get the current settings for the entity note for an
+ * entity type and bundle.
+ * 
+ * @param string $type
+ *  Entity type for which to retrieve the settings for.
+ * @param string $bundle
+ *  The name of the bundle to fetch the settings for.
+ * @return array
+ *  An array of settings to retrieve for that entity type
+ *  and entity bundle.
+ */
+function _entity_note_get_note_settings($type, $bundle) {
+  $settings = variable_get("entity_note_{$type}__{$bundle}", array()) + array(
+    'enabled'    => FALSE,
+    'display'    => ENTITY_NOTE_DISPLAY_DISABLED,
+    'page_size'  => 25,
+    'show_modes' => array(),
+  );
+  
+  return $settings;
+}
+
+/**
+ * Save the settings for the entity note of an entity type and bundle.
+ * 
+ * @param string $type
+ *  Name of the entity type which we wish to save settings for.
+ * @param string $bundle
+ *  Name of the bundle of the entity type to save settings for.
+ * @param array $settings
+ *  Reference to the settings to save for this entity note type.
+ */
+function _entity_note_set_note_settings($type, $bundle, array &$settings) {
+  // Add the defaults and current settings before saving.
+  $settings += _entity_note_get_note_settings($type, $bundle);
+  
+  variable_set("entity_note_{$type}__{$bundle}", $settings);
+}

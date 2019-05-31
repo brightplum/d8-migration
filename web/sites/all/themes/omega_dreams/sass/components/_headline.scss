@@ -1,0 +1,10 @@
+﻿
+.view-news.view-display-id-article_display_page {
+
+  a.article-title {
+    //@extend .article-title;
+  }
+  a.read-more {
+    @extend .chevron;
+  }
+}

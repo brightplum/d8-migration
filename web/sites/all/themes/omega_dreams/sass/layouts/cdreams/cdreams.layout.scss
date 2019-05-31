@@ -1,0 +1,159 @@
+/*******************************************************************************
+ * simple.layout.scss
+ *
+ * Styling of the "simple" layout demonstrating the Compass grid extension Susy
+ * and building mobile first layouts.
+ ******************************************************************************/
+@import "susy";
+
+// Susy Variables
+
+// Set consistent vertical and horizontal spacing units.
+$vert-spacing-unit: 20px;
+$horz-spacing-unit: 1em;
+
+// Define Susy grid variables mobile first.
+$total-columns: 4;
+$column-width: 4em;
+$gutter-width: $horz-spacing-unit;
+$grid-padding: 5px;
+
+$container-style: magic;
+$container-width: 1200px;
+
+// Susy Media Layouts @see http://susy.oddbird.net/guides/reference/#ref-media-layouts
+$phone: 20em 12 44em;
+$tab: 900px 12; // At 44em use 12 columns.
+$desk: 1024px 16; // At 70em use 16 columns.
+
+.l-main,
+.l-footer {
+  @include container; // Define these elements as the grid containers.
+  margin-bottom: $vert-spacing-unit;
+  opacity: 1;
+  transition: all .3s ease;
+
+  padding: 0 2rem;
+
+}
+.l-region--highlighted,
+.l-region--help,
+.l-region--sidebar-first,
+.l-region--sidebar-second {
+  margin-bottom: $vert-spacing-unit;
+}
+
+// Opacity when nav is open.
+.slide-out-menu-open {
+  .l-main {
+    opacity: 0.2;
+  }
+}
+
+@include at-breakpoint($phone) { // At a given Susy Media Layout, use a given amount of columns.
+  .l-branding {
+    @include span-columns(12 omega, 12); // Span 4 out of 12 columns.
+  }
+}
+@include at-breakpoint($tab) { // At a given Susy Media Layout, use a given amount of columns.
+  .l-main,
+  .l-footer {
+    @include set-container-width; // Reset only the container width (elements have already been declared as containers).
+  }
+
+  .l-branding {
+    @include span-columns(6, 12); // Span 4 out of 12 columns.
+  }
+  .l-region--navigation {
+    clear: both;
+  }
+
+  .has-sidebar-first,
+  .has-sidebar-second,
+  .has-two-sidebars {
+    .l-content {
+      @include span-columns(8, 12); // Span 8 out of 12 columns.
+    }
+    .l-region--sidebar-first,
+    .l-region--sidebar-second {
+      @include span-columns(4 omega, 12); // Span the last (omega) 4 columns of 12.
+    }
+    .l-region--sidebar-second {
+      clear: right;
+    }
+  }
+}
+@include at-breakpoint($desk) {
+  .cta-super-header-applied {
+    .l-main {
+      padding-top: 2rem;
+    }
+  }
+
+  .l-main,
+  .l-footer {
+    @include set-container-width; // Reset only the container width (elements have already been declared as containers).
+  }
+
+  #navigation-container {
+    @include set-container-width;
+    margin: 0 auto;
+  }
+
+  .l-branding {
+    max-width: 100%;
+    @include span-columns(16, 16);
+    margin: 0;
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+    .site-logo {
+      @include span-columns(3, 16);
+      display: block;
+      img {
+        width: 100%;
+        height: auto;
+      }
+    }
+    .nav {
+      margin: 0;
+    }
+  }
+
+  .has-sidebar-first {
+    .l-content {
+      @include span-columns(12 omega, 16); // Span the last (omega) 12 columns of 16.
+    }
+    .l-region--sidebar-first {
+      @include span-columns(4, 16); // Span 4 out of 16 columns.
+    }
+  }
+  .has-sidebar-second {
+    .l-content {
+      @include span-columns(10, 16); // Span 12 out of 16 columns.
+    }
+    .l-region--sidebar-second {
+      @include span-columns(6 omega, 16); // Span the last (omega) 4 columns of 16.
+      clear: none;
+    }
+  }
+
+  .has-two-sidebars {
+    .l-content {
+      @include span-columns(8, 16); // Span 8 out of 16 columns.
+      @include push(4, 16); // Push element by adding 4 out of 16 columns of left margin.
+    }
+    .l-region--sidebar-first,
+    .l-region--sidebar-second {
+      @include span-columns(4, 16); // Span 4 out of 16 columns.
+    }
+    .l-region--sidebar-first {
+      @include pull(12, 16); // Pull element by adding 12 out of 16 columns of negative left margin.
+    }
+    .l-region--sidebar-second {
+      @include omega; // This element spans the last (omega) column.
+      clear: none;
+    }
+  }
+}
+

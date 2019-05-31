@@ -1,0 +1,35 @@
+;
+; Developed: Image Works (http://www.imagewks.com)
+;
+; Author(s): Liem Khuu   (liem@imagewks.com)
+; ==========================================
+
+name = Image Works Formatters
+package = Image Works Utilities
+description = Adds an additional formatter for various fields and field groups.
+
+core = 7.x
+version = 7.x-1.0
+
+
+dependencies[] = text
+dependencies[] = field_formatter_settings
+
+recommends[] = field_empty
+
+
+configure = admin/config/system/iwapi-utils/iwformatter
+
+
+; Library files
+; ==================================
+files[] = lib/iwFieldGrouper.inc
+files[] = lib/iwFieldWrapperAttacher.inc
+
+files[] = lib/widgets/iwIFieldWidget.inc
+files[] = lib/widgets/iwEntityRefFieldWidget.inc
+
+files[] = lib/formatters/iwFieldFormatter.inc
+
+files[] = lib/wrappers/iwInlineFieldWrapper.inc
+files[] = lib/wrappers/iwConditionalFieldWrapper.inc

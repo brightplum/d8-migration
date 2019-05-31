@@ -1,0 +1,6 @@
+[submodule "sites/all/modules/custom/iwapi"]
+	path = sites/all/modules/custom/iwapi
+	url = ssh://git@imagewks.repositoryhosting.com/imagewks/iwapi.git
+[submodule "sites/all/modules/custom/iwsearch"]
+	path = sites/all/modules/custom/iwsearch
+	url = ssh://git@imagewks.repositoryhosting.com/imagewks/iwsearch.git
