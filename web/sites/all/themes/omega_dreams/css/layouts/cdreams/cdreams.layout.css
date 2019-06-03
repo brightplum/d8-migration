@@ -1,0 +1,170 @@
+/*******************************************************************************
+ * simple.layout.scss
+ *
+ * Styling of the "simple" layout demonstrating the Compass grid extension Susy
+ * and building mobile first layouts.
+ ******************************************************************************/
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\0000329}}
+.l-main,
+.l-footer {
+  *zoom: 1;
+  max-width: 1190px;
+  max-width: 74.375rem;
+  _width: 1190px;
+  padding-left: 5px;
+  padding-left: 0.3125rem;
+  padding-right: 5px;
+  padding-right: 0.3125rem;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 20px;
+  opacity: 1;
+  transition: all .3s ease;
+  padding: 0 2rem; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Library\/Ruby\/Gems\/2\.3\.0\/gems\/compass-core-1\.0\.3\/stylesheets\/compass\/utilities\/general\/_clearfix\.scss}line{font-family:\0000338}}
+  .l-main:after,
+  .l-footer:after {
+    content: "";
+    display: table;
+    clear: both; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\0000339}}
+.l-region--highlighted,
+.l-region--help,
+.l-region--sidebar-first,
+.l-region--sidebar-second {
+  margin-bottom: 20px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\0000348}}
+.slide-out-menu-open .l-main {
+  opacity: 0.2; }
+
+@media (min-width: 20em) and (max-width: 44em) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\0000355}}
+  .l-branding {
+    width: 100%;
+    float: right;
+    margin-right: 0; } }
+@media (min-width: 900px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\0000361}}
+  .l-main,
+  .l-footer {
+    max-width: 1190px;
+    max-width: 74.375rem; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\0000366}}
+  .l-branding {
+    width: 49.15254%;
+    float: left;
+    margin-right: 1.69492%; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\0000369}}
+  .l-region--navigation {
+    clear: both; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\0000376}}
+  .has-sidebar-first .l-content,
+  .has-sidebar-second .l-content,
+  .has-two-sidebars .l-content {
+    width: 66.10169%;
+    float: left;
+    margin-right: 1.69492%; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\0000379}}
+  .has-sidebar-first .l-region--sidebar-first,
+  .has-sidebar-first .l-region--sidebar-second,
+  .has-sidebar-second .l-region--sidebar-first,
+  .has-sidebar-second .l-region--sidebar-second,
+  .has-two-sidebars .l-region--sidebar-first,
+  .has-two-sidebars .l-region--sidebar-second {
+    width: 32.20339%;
+    float: right;
+    margin-right: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\0000383}}
+  .has-sidebar-first .l-region--sidebar-second,
+  .has-sidebar-second .l-region--sidebar-second,
+  .has-two-sidebars .l-region--sidebar-second {
+    clear: right; } }
+@media (min-width: 1024px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\0000390}}
+  .cta-super-header-applied .l-main {
+    padding-top: 2rem; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\0000395}}
+  .l-main,
+  .l-footer {
+    max-width: 1190px;
+    max-width: 74.375rem; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\00003100}}
+  #navigation-container {
+    max-width: 1190px;
+    max-width: 74.375rem;
+    margin: 0 auto; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\00003105}}
+  .l-branding {
+    max-width: 100%;
+    width: 100%;
+    float: left;
+    margin-right: 1.26582%;
+    margin: 0;
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\00003112}}
+    .l-branding .site-logo {
+      width: 17.72152%;
+      float: left;
+      margin-right: 1.26582%;
+      display: block; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\00003115}}
+      .l-branding .site-logo img {
+        width: 100%;
+        height: auto; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\00003120}}
+    .l-branding .nav {
+      margin: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\00003126}}
+  .has-sidebar-first .l-content {
+    width: 74.68354%;
+    float: right;
+    margin-right: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\00003129}}
+  .has-sidebar-first .l-region--sidebar-first {
+    width: 24.05063%;
+    float: left;
+    margin-right: 1.26582%; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\00003134}}
+  .has-sidebar-second .l-content {
+    width: 62.02532%;
+    float: left;
+    margin-right: 1.26582%; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\00003137}}
+  .has-sidebar-second .l-region--sidebar-second {
+    width: 36.70886%;
+    float: right;
+    margin-right: 0;
+    clear: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\00003144}}
+  .has-two-sidebars .l-content {
+    width: 49.36709%;
+    float: left;
+    margin-right: 1.26582%;
+    margin-left: 25.31646%; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\00003148}}
+  .has-two-sidebars .l-region--sidebar-first,
+  .has-two-sidebars .l-region--sidebar-second {
+    width: 24.05063%;
+    float: left;
+    margin-right: 1.26582%; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\00003152}}
+  .has-two-sidebars .l-region--sidebar-first {
+    margin-left: -75.94937%; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/joeybarra\/Documents\/projects\/commondreams\/sites\/all\/themes\/omega_dreams\/sass\/layouts\/cdreams\/cdreams\.layout\.scss}line{font-family:\00003155}}
+  .has-two-sidebars .l-region--sidebar-second {
+    float: right;
+    margin-right: 0;
+    clear: none; } }

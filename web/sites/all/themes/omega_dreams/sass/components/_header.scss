@@ -1,4 +1,4 @@
-﻿@import "susy";
+﻿@import "susyone";
 $phone: 20em 12 44em;
 $tab: 768px 16;
 $desk: 1024px 16;
@@ -6,10 +6,14 @@ $large: 1440px 16;
 
 body {
   padding-top: 70px !important;
-  @include at-breakpoint($tab) {
+}
+@include at-breakpoint($tab) {
+  body {
     padding-top: 150px !important;
   }
-  @include at-breakpoint($desk) {
+}
+@include at-breakpoint($desk) {
+  body {
     padding-top: 130px !important;
   }
 }
@@ -33,9 +37,6 @@ body.imce {
     background: $color_bg_header;
     color: #fff;
     padding: 0 0.5rem;
-    @include at-breakpoint($tab) {
-      padding: 0 1rem;
-    }
     a {
       color: #fff;
     }
@@ -101,10 +102,6 @@ body.imce {
                 width: 0.75em;
                 height: 2px;
 
-                @include at-breakpoint($tab) {
-                  width: 1.5em;
-                }
-
                 &:before, &:after {
                   @include transition(all .3s ease);
                   transform-origin: center;
@@ -119,24 +116,15 @@ body.imce {
 
                 &:before {
                   top: -0.25em;
-                  @include at-breakpoint($tab) {
-                    top: -0.5em;
-                  }
                 }
                 &:after {
                   top: 0.3em;
-                  @include at-breakpoint($tab) {
-                    top: 0.5em;
-                  }
                 }
               }
 
               // Active.
               &.open {
                 top: 0.5em;
-                @include at-breakpoint($tab) {
-                  top: 0;
-                }
                 &:after {
                   display: block;
                 }
@@ -144,34 +132,21 @@ body.imce {
                   background-color: transparent;
                   &:before {
                     transform: rotate(45deg) translate(-0.03em, -0.03em);
-                    @include at-breakpoint($tab) {
-                      transform: rotate(45deg) translate(0.3em, 0.3em);
-                    }
                   }
                   &:after {
                     transform: rotate(-45deg) translate(0.4em, -0.4em);
-                    @include at-breakpoint($tab) {
-                      transform: rotate(-45deg) translate(0.4em, -0.4em);
-                    }
                   }
                 }
               }
             }
             .label {
               display: none;
-              @include at-breakpoint($desk) {
-                display: inline;
-                text-transform: uppercase;
-              }
             }
           }
           #search-icon {
             padding-left: 1rem;
             #search-toggle.active {
               color: #FFCC00;
-            }
-            @include at-breakpoint($tab) {
-              padding-left: 2rem;
             }
           }
         }
@@ -184,26 +159,14 @@ body.imce {
             img {
               @include transition(all .3s ease);
               max-width: 100px;
-              @include at-breakpoint($tab) {
-                max-width: 300px;
-              }
             }
           }
         }
         &.header-right {
-
-          @include at-breakpoint($tab) {
-            flex: 2;
-            justify-content: flex-end;
-            -webkit-justify-content: center;
-          }
           .button {
             border-radius: 3px;
             margin: 0 0.5rem;
             font-size: 0.7rem;
-            @include at-breakpoint($tab) {
-              font-size: 1rem;
-            }
             &.button--secondary {
               background: #FFF;
               color: $color_bg_header;
@@ -277,10 +240,6 @@ body.imce {
             &:focus {
               outline: none;
             }
-            @include at-breakpoint($tab) {
-              padding: 20px 20px 20px 0;
-              font-size: 3rem;
-            }
           }
           ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
             color: #ccc;
@@ -305,9 +264,6 @@ body.imce {
             //display: none;
             //opacity: 0;
             @include transition(opacity 3s ease);
-            @include at-breakpoint($tab) {
-              font-size: 3rem;
-            }
           }
         }
       }
@@ -323,13 +279,107 @@ body.imce {
         display: inline-block;
         opacity: 1;
       }
+    }
+  }
+}
 
-      @include at-breakpoint($tab) {
+@include at-breakpoint($tab) {
+  #header-container {
+    #header-top {
+      padding: 0 1rem;
+      .l-header {
+        .col {
+          &.header-left {
+            #mobile-menu-wrapper {
+              #slide-menu-button {
+                .slide-menu-lines {
+                  width: 1.5em;
+                  &:before {
+                    top: -0.5em;
+                  }
+                }
+                &.open {
+                  top: 0;
+                  .slide-menu-lines {
+                    &:before {
+                      transform: rotate(45deg) translate(0.3em, 0.3em);
+                    }
+                    &:after {
+                      transform: rotate(-45deg) translate(0.4em, -0.4em);
+                    }
+                  }
+                }
+              }
+            }
+            #search-icon {
+              padding-left: 2rem;
+            }
+          }
+          &.header-middle {
+            .site-logo {
+              img {
+                max-width: 300px;
+              }
+            }
+          }
+          &.header-right {
+            flex: 2;
+            justify-content: flex-end;
+            -webkit-justify-content: center;
+            .button {
+              font-size: 1rem;
+            }
+          }
+        }
+      }
+    }
+    #header-content {
+      #block-search-form {
+        .container-inline {
+          .form-item {
+            flex: 11;
+            input {
+              padding: 20px 20px 20px 0;
+              font-size: 3rem;
+            }
+          }
+          .form-actions {
+            button {
+              font-size: 3rem;
+            }
+          }
+        }
+      }
+
+      &.showing {
         height: 150px;
       }
     }
   }
+
 }
+
+@include at-breakpoint($desk) {
+  #header-container {
+    #header-top {
+      .l-header {
+        .col {
+          &.header-left {
+            #mobile-menu-wrapper {
+              .label {
+                display: inline;
+                text-transform: uppercase;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
 
 // Slim Header Fixed.
 body.header-container-slim {
@@ -344,9 +394,7 @@ body.header-container-slim {
           .site-logo {
             img {
               max-width: 100px;
-              @include at-breakpoint($tab) {
-                max-width: 150px;
-              }
+
             }
           }
         }
@@ -358,6 +406,21 @@ body.header-container-slim {
           a {
             font-size: 0.875rem;
             padding: 0.5rem;
+          }
+        }
+      }
+    }
+  }
+}
+@include at-breakpoint($tab) {
+  body.header-container-slim {
+    #header-container {
+      #header-top {
+        .l-header {
+          .header-middle {
+            .site-logo {
+              max-width: 150px;
+            }
           }
         }
       }

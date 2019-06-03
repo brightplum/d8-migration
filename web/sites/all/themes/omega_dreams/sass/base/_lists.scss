@@ -8,7 +8,7 @@
 			li {
 				list-style-type: none;
 				padding: 0 0 5px 0;
-				&:before {    
+				&:before {
 					content: '\f054';
 					font-family: FontAwesome;
 					color: $color_accent;
@@ -16,22 +16,5 @@
 				} // :before
 			} // li
 		} // ul
-	} // .field--name-body 
+	} // .field--name-body
 } // .l-main
-
-
-// Override Shareaholic List
-.shareaholic-canvas {
-	.shareaholic-share-buttons-container .shareaholic-share-buttons-wrapper {
-	  display: inline !important;
-	}
-	.shareaholic-share-buttons-container ul.shareaholic-share-buttons {
-	  margin: 0 !important;
-	  padding: 0 !important;
-	}
-	.shareaholic-share-buttons-container li.shareaholic-share-button {
-	  margin: 0 10px 0 0 !important;
-	  padding:  0 !important;
-	}
-}
-// END - Override Shareaholic List

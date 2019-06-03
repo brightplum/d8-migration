@@ -1,8 +1,9 @@
 // Import external libraries.
 @import "compass";
+@import "susy";
 @import "breakpoint";
 @import "singularitygs";
-@import "toolkit-no-css";
+@import "toolkit/kickstart";
 @import "../font-awesome/scss/font-awesome";
 
 // Import variables, abstractions, base styles and components using globbing.
@@ -18,9 +19,7 @@
 // output any styles themselves: Importing them multiple times to resolve
 // dependencies shouldn't be a problem.
 @import "mixins";
-@import "variables/**/*";
-@import "abstractions/**/*";
-@import "base/**/*";
-@import "components/**/*";
-
+@import "variables/*";
+@import "base/*";
 @import "themes/standard-two";
+@import "components/*";

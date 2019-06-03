@@ -1,4 +1,6 @@
 // Susy Media Layouts @see http://susy.oddbird.net/guides/reference/#ref-media-layouts
+@import "susyone";
+
 $phone: 20em 12 44em;
 $tab: 768px 16;
 $desk: 1024px 16;
@@ -366,6 +368,7 @@ body.cta-slide-down-from-top-showing {
     }
     #slim-display-content-mobile {
       @include slim-header-cta-transition();
+      width: 100%;
       padding: 10px;
       @include at-breakpoint($tab) {
         display: none;
@@ -1120,4 +1123,6 @@ body.slide-out-menu-open {
     font-size: 1.5rem;
   }
 }
+
+// CTA MODAL
 

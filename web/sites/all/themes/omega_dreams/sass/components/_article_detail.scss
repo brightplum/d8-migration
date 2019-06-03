@@ -1,4 +1,4 @@
-﻿@import "susy";
+﻿@import "susyone";
 $phone: 20em 12 44em;
 $tab: 768px 16;
 $desk: 1024px 16;
@@ -21,13 +21,13 @@ $large: 1440px 16;
 
 .field--name-field-author-profile  {
   margin: 50px 0;
-        
+
   > .field__items > .field__item {
     margin: 0 0 10px 0;
   }
 
   h2 { display: none; }
-  
+
   .field--name-field-image,
   .field--name-field-profile-img {
     float: left;
@@ -47,7 +47,10 @@ $large: 1440px 16;
 h1.node__title {
   margin-bottom: 5px !important;
   font-size: 1.75rem;
-  @include at-breakpoint($desk) {
+
+}
+@include at-breakpoint($desk) {
+  h1.node__title {
     font-size: 2.25rem;
   }
 }
@@ -57,12 +60,12 @@ h1.node__title {
   font-size: 14px;
   font-style: italic;
   margin-bottom: 5px;
-  
+
   .grouping-prefix {
     margin-left: 0;
     margin-right: 0.21em;
   }
-  
+
   p { margin: 0; }
 }
 
@@ -81,9 +84,6 @@ margin-left: 0;
 margin-right: 0.21em !important;
 }
 
-.shareaholic-canvas {
-	margin-bottom: 10px;
-}
 
 .field-wrapper  {
 	margin: 10px 0;
@@ -108,7 +108,11 @@ margin-right: 0.21em !important;
     float: none;
     width: 100%;
     padding: 0;
-    @include at-breakpoint($tab) {
+  }
+}
+@include at-breakpoint($tab) {
+  .field--name-body {
+    .pullquote {
       text-align: right;
       float: right;
       width: 40%;
@@ -213,6 +217,6 @@ margin-right: 0.21em !important;
     }
 
   }
-  
+
   .omega { margin-right: 0; }
 }

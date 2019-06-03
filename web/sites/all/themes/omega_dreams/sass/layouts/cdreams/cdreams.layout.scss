@@ -4,7 +4,7 @@
  * Styling of the "simple" layout demonstrating the Compass grid extension Susy
  * and building mobile first layouts.
  ******************************************************************************/
-@import "susy";
+@import "susyone";
 
 // Susy Variables
 
@@ -50,11 +50,13 @@ $desk: 1024px 16; // At 70em use 16 columns.
   }
 }
 
+
 @include at-breakpoint($phone) { // At a given Susy Media Layout, use a given amount of columns.
   .l-branding {
     @include span-columns(12 omega, 12); // Span 4 out of 12 columns.
   }
 }
+
 @include at-breakpoint($tab) { // At a given Susy Media Layout, use a given amount of columns.
   .l-main,
   .l-footer {

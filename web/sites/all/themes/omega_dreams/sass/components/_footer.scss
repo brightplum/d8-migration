@@ -1,4 +1,4 @@
-﻿@import "susy";
+﻿@import "susyone";
 $phone: 20em 12 44em;
 $tab: 900px 16;
 $desk: 1024px 16;
@@ -18,7 +18,7 @@ $desk: 1024px 16;
         font-size: 18px;
         border-bottom: none;
         margin: 0;
-        span { 
+        span {
             border-bottom: none;
         }
         &:after { display: none !important; }
@@ -84,12 +84,12 @@ $desk: 1024px 16;
 .footer-social {
     font-size: 40px;
     color: $color_accent;
-    a { 
-        color: $color_accent; 
+    a {
+        color: $color_accent;
         display: inline-block;
         margin-right: 10px;
         &:last-child {
-            
+
         }
     }
 

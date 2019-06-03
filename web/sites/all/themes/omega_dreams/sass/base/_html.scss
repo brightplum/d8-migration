@@ -1,4 +1,4 @@
-@import "susy";
+@import "susyone";
 $phone: 20em 12 44em;
 $tab: 768px 16;
 $desk: 1024px 16;
@@ -92,9 +92,11 @@ a.btn {
 .node {
     padding-right: 0;
     font-family: $font_serif;
-	@include at-breakpoint($tab) {
-		padding-right: 40px;
-	}
+}
+@include at-breakpoint($tab) {
+  .node {
+    padding-right: 40px;
+  }
 }
 
 // override
