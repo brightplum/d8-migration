@@ -3,7 +3,7 @@
 #
 
 # Protect files and directories from prying eyes.
-<FilesMatch "\.(engine|inc|info|install|make|module|profile|test|po|sh|.*sql|theme|tpl(\.php)?|xtmpl)(~|\.sw[op]|\.bak|\.orig|\.save)?$|^(\.(?!well-known).*|Entries.*|Repository|Root|Tag|Template|composer\.(json|lock))$|^#.*#$|\.php(~|\.sw[op]|\.bak|\.orig\.save)$">
+<FilesMatch "\.(engine|inc|install|make|module|profile|po|sh|.*sql|theme|twig|tpl(\.php)?|xtmpl|yml)(~|\.sw[op]|\.bak|\.orig|\.save)?$|^(\.(?!well-known).*|Entries.*|Repository|Root|Tag|Template|composer\.(json|lock))$|^#.*#$|\.php(~|\.sw[op]|\.bak|\.orig|\.save)$">
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>
@@ -15,28 +15,28 @@
 # Don't show directory listings for URLs which map to a directory.
 Options -Indexes
 
-# Follow symbolic links in this directory.
-Options +FollowSymLinks
-
-# Make Drupal handle any 404 errors.
-ErrorDocument 404 /index.php
-
 # Set the default handler.
 DirectoryIndex index.php index.html index.htm
 
-# Override PHP settings that cannot be changed at runtime. See
-# sites/default/default.settings.php and drupal_environment_initialize() in
-# includes/bootstrap.inc for settings that can be changed at runtime.
+# Add correct encoding for SVGZ.
+AddType image/svg+xml svg svgz
+AddEncoding gzip svgz
+
+# Most of the following PHP settings cannot be changed at runtime. See
+# sites/default/default.settings.php and
+# Drupal\Core\DrupalKernel::bootEnvironment() for settings that can be
+# changed at runtime.
 
 # PHP 5, Apache 1 and 2.
 <IfModule mod_php5.c>
-  php_flag magic_quotes_gpc                 off
-  php_flag magic_quotes_sybase              off
-  php_flag register_globals                 off
+  php_value assert.active                   0
   php_flag session.auto_start               off
   php_value mbstring.http_input             pass
   php_value mbstring.http_output            pass
   php_flag mbstring.encoding_translation    off
+  # PHP 5.6 has deprecated $HTTP_RAW_POST_DATA and produces warnings if this is
+  # not set.
+  php_value always_populate_raw_post_data   -1
 </IfModule>
 
 # Requires mod_expires to be enabled.
@@ -57,24 +57,24 @@ DirectoryIndex index.php index.html index.htm
   </FilesMatch>
 </IfModule>
 
+# Set a fallback resource if mod_rewrite is not enabled. This allows Drupal to
+# work without clean URLs. This requires Apache version >= 2.2.16. If Drupal is
+# not accessed by the top level URL (i.e.: http://example.com/drupal/ instead of
+# http://example.com/), the path to index.php will need to be adjusted.
+<IfModule !mod_rewrite.c>
+  FallbackResource /index.php
+</IfModule>
+
 # Various rewrite rules.
 <IfModule mod_rewrite.c>
   RewriteEngine on
-  RewriteCond %{HTTP_HOST} ^commondreams.org [NC]
-  RewriteRule ^(.*)$ https://www.commondreams.org/$1 [L,R=301]
 
   # Set "protossl" to "s" if we were accessed via https://.  This is used later
   # if you enable "www." stripping or enforcement, in order to ensure that
   # you don't bounce between http and https.
-
   RewriteRule ^ - [E=protossl]
   RewriteCond %{HTTPS} on
-  ##RewriteRule (.*) http://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
   RewriteRule ^ - [E=protossl:s]
-
-  #RewriteCond %{HTTP_HOST} ^commondreams.org [NC]
-  #RewriteRule ^(.*)$ http://www.commondreams.org/$1 [L,R=301]
 
   # Make sure Authorization HTTP header is available to PHP
   # even when running as CGI or FastCGI.
@@ -87,27 +87,27 @@ DirectoryIndex index.php index.html index.htm
   # above.
   #
   # NOTE: This only works when mod_rewrite is loaded. Without mod_rewrite, it is
-  # not possible to block access to entire directories from .htaccess, because
+  # not possible to block access to entire directories from .htaccess because
   # <DirectoryMatch> is not allowed here.
   #
   # If you do not have mod_rewrite installed, you should remove these
   # directories from your webroot or otherwise protect them from being
   # downloaded.
-  RewriteRule "(^|/)\." - [F]
+  RewriteRule "/\.|^\.(?!well-known/)" - [F]
 
   # If your site can be accessed both with and without the 'www.' prefix, you
   # can use one of the following settings to redirect users to your preferred
   # URL, either WITH or WITHOUT the 'www.' prefix. Choose ONLY one option:
   #
   # To redirect all users to access the site WITH the 'www.' prefix,
-  # (http://example.com/... will be redirected to http://www.example.com/...)
+  # (http://example.com/foo will be redirected to http://www.example.com/foo)
   # uncomment the following:
   # RewriteCond %{HTTP_HOST} .
   # RewriteCond %{HTTP_HOST} !^www\. [NC]
   # RewriteRule ^ http%{ENV:protossl}://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
   #
   # To redirect all users to access the site WITHOUT the 'www.' prefix,
-  # (http://www.example.com/... will be redirected to http://example.com/...)
+  # (http://www.example.com/foo will be redirected to http://example.com/foo)
   # uncomment the following:
   # RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
   # RewriteRule ^ http%{ENV:protossl}://%1%{REQUEST_URI} [L,R=301]
@@ -122,34 +122,41 @@ DirectoryIndex index.php index.html index.htm
   # uncomment the following line:
   # RewriteBase /
 
-  # ----------------------------------------
-  # Translate from old URL's to new ones.
-  #RewriteRule ^(headline|video)/(\d{4}/\d{2}/\d{2}) http://%{HTTP_HOST}/news/$2 [L,R=301]
-  #RewriteRule ^view/(\d{4}/\d{2}/\d{2}) http://%{HTTP_HOST}/views/$1 [L,R=301]
-  #RewriteRule ^(further|newswire)/(\d{4}/\d{2}/\d{2})-\d+ http://%{HTTP_HOST}/$1/$2 [L,R=301]
-  RewriteCond %{REQUEST_URI} !^/views/101500-101.htm
-  RewriteRule ^views/(.*)\.(htm|html|jge?g|gif|png)$ https://%{HTTP_HOST}/view/$1.$2 [L,R=301]
+  # Redirect common PHP files to their new locations.
+  RewriteCond %{REQUEST_URI} ^(.*)?/(install.php) [OR]
+  RewriteCond %{REQUEST_URI} ^(.*)?/(rebuild.php)
+  RewriteCond %{REQUEST_URI} !core
+  RewriteRule ^ %1/core/%2 [L,QSA,R=301]
 
-  # ----------------------------------------
-  # Ensure that all image styles are built initially
-  # on the master computer images generated on the
-  # slaves could cause conflicts that this should avoid.
-  # RewriteCond %{REQUEST_FILENAME} !-f
-  # RewriteCond %{SERVER_ADDR} !162.242.214.103
-  # RewriteRule ^sites/default/files/styles/.+\.(jpe?g|gif|png) http://162.242.21$
+  # Rewrite install.php during installation to see if mod_rewrite is working
+  RewriteRule ^core/install.php core/install.php?rewrite=ok [QSA,L]
 
   # Pass all requests not referring directly to files in the filesystem to
-  # index.php. Clean URLs are handled in drupal_environment_initialize().
+  # index.php.
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_URI} !=/favicon.ico
   RewriteRule ^ index.php [L]
 
+  # For security reasons, deny access to other PHP files on public sites.
+  # Note: The following URI conditions are not anchored at the start (^),
+  # because Drupal may be located in a subdirectory. To further improve
+  # security, you can replace '!/' with '!^/'.
+  # Allow access to PHP files in /core (like authorize.php or install.php):
+  RewriteCond %{REQUEST_URI} !/core/[^/]*\.php$
+  # Allow access to test-specific PHP files:
+  RewriteCond %{REQUEST_URI} !/core/modules/system/tests/https?.php
+  # Allow access to Statistics module's custom front controller.
+  # Copy and adapt this rule to directly execute PHP files in contributed or
+  # custom modules or to run another PHP application in the same directory.
+  RewriteCond %{REQUEST_URI} !/core/modules/statistics/statistics.php$
+  # Deny access to any other PHP files that do not match the rules above.
+  # Specifically, disallow autoload.php from being served directly.
+  RewriteRule "^(.+/.*|autoload)\.php($|/)" - [F]
+
   # Rules to correctly serve gzip compressed CSS and JS files.
   # Requires both mod_rewrite and mod_headers to be enabled.
   <IfModule mod_headers.c>
-    # Disable content sniffing, since it's an attack vector.
-    Header always set X-Content-Type-Options nosniff
     # Serve gzip compressed CSS files if they exist and the client accepts gzip.
     RewriteCond %{HTTP:Accept-encoding} gzip
     RewriteCond %{REQUEST_FILENAME}\.gz -s
@@ -169,140 +176,14 @@ DirectoryIndex index.php index.html index.htm
       Header set Content-Encoding gzip
       # Force proxies to cache gzipped & non-gzipped css/js files separately.
       Header append Vary Accept-Encoding
-      # Set Strict Transport Security on favicon.
-      Header always set Strict-Transport-Security "max-age=10886400"
-    </FilesMatch>
-
-    <FilesMatch ".(flv|gif|jpg|jpeg|png|ico|swf|js|css|pdf)$">
-      # Set a far future Cache-Control header to 480 weeks.
-      Header set Cache-Control "max-age=31536000, no-transform, public, immutable"
-      # Set a far future Expires header.
-      Header set Expires "Tue, 20 Jan 2037 04:20:42 GMT"
-      # Set Strict Transport Security on favicon.
-      Header always set Strict-Transport-Security "max-age=10886400"
-      # Do not use etags for cache validation.
-      Header unset ETag
     </FilesMatch>
   </IfModule>
 </IfModule>
 
-Redirect /newswire.htm https://www.commondreams.org
-Redirect http://action.commondreams.org/ https://www.commondreams.org/
-RewriteCond %{HTTP_HOST} ^action\.commondreams\.org$
-RewriteRule ^(.*)$ https://www.commondreams.org/$1 [L,R=301]
-
-# Serve resources with the proper media types (f.k.a. MIME types).
-# https://www.iana.org/assignments/media-types/media-types.xhtml
-
-<IfModule mod_mime.c>
-
-  # Data interchange
-
-    # 2.2.x+
-
-    AddType text/xml                                    xml
-
-    # 2.2.x - 2.4.x
-
-    AddType application/json                            json
-    AddType application/rss+xml                         rss
-
-    # 2.4.x+
-
-    AddType application/json                            map
-
-  # JavaScript
-
-    # 2.2.x+
-
-    # See: https://html.spec.whatwg.org/multipage/scripting.html#scriptingLanguages.
-    AddType text/javascript                             js mjs
-
-
-  # Manifest files
-
-    # 2.2.x+
-
-    AddType application/manifest+json                   webmanifest
-    AddType text/cache-manifest                         appcache
-
-
-  # Media files
-
-    # 2.2.x - 2.4.x
-
-    AddType audio/mp4                                   f4a f4b m4a
-    AddType audio/ogg                                   oga ogg spx
-    AddType video/mp4                                   mp4 mp4v mpg4
-    AddType video/ogg                                   ogv
-    AddType video/webm                                  webm
-    AddType video/x-flv                                 flv
-
-    # 2.2.x+
-
-    AddType image/svg+xml                               svgz
-    AddType image/x-icon                                cur
-
-    # 2.4.x+
-
-    AddType image/webp                                  webp
-
-
-  # Web fonts
-
-    # 2.2.x - 2.4.x
-
-    AddType application/vnd.ms-fontobject               eot
-
-    # 2.2.x+
-
-    AddType font/woff                                   woff
-    AddType font/woff2                                  woff2
-    AddType font/ttf                                    ttf
-    AddType font/collection                             ttc
-    AddType font/otf                                    otf
-
-
-  # Other
-
-    # 2.2.x+
-
-    AddType text/vtt                                    vtt
-
+# Various header fixes.
+<IfModule mod_headers.c>
+  # Disable content sniffing, since it's an attack vector.
+  Header always set X-Content-Type-Options nosniff
+  # Disable Proxy header, since it's an attack vector.
+  RequestHeader unset Proxy
 </IfModule>
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# Serve all resources labeled as `text/html` or `text/plain`
-# with the media type `charset` parameter set to `utf-8`.
-#
-# https://httpd.apache.org/docs/current/mod/core.html#adddefaultcharset
-
-AddDefaultCharset utf-8
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# Serve the following file types with the media type `charset`
-# parameter set to `utf-8`.
-#
-# https://httpd.apache.org/docs/current/mod/mod_mime.html#addcharset
-
-<IfModule mod_mime.c>
-  AddCharset utf-8 .appcache \
-                   .atom \
-                   .css \
-                   .js \
-                   .json \
-                   .manifest \
-                   .map \
-                   .mjs \
-                   .rdf \
-                   .rss \
-                   .vtt \
-                   .webmanifest \
-                   .xml
-</IfModule>
-
-<ifModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE image/vnd.microsoft.icon
-</ifModule>

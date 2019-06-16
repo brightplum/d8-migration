@@ -1,0 +1,5 @@
+name: app
+recipe: drupal7
+config:
+  webroot: web
+  via: nginx

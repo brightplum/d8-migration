@@ -1,37 +1,43 @@
 <?php
 /**
  * @file
- * Platform.sh example settings.php file for Drupal 7.
+ * Platform.sh example settings.php file for Drupal 8.
  */
 
-// Recommended PHP settings.
-ini_set('session.gc_probability', 1);
-ini_set('session.gc_divisor', 100);
-ini_set('session.gc_maxlifetime', 200000);
-ini_set('session.cookie_lifetime', 2000000);
-ini_set('pcre.backtrack_limit', 200000);
-ini_set('pcre.recursion_limit', 200000);
-
-// Default Drupal 7 settings.
+// Default Drupal 8 settings.
 //
 // These are already explained with detailed comments in Drupal's
 // default.settings.php file.
 //
-// See https://api.drupal.org/api/drupal/sites!default!default.settings.php/7
-$databases = array();
-$update_free_access = FALSE;
-$drupal_hash_salt = '';
+// See https://api.drupal.org/api/drupal/sites!default!default.settings.php/8
+$databases = [];
+$config_directories = [];
+$settings['update_free_access'] = FALSE;
+$settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
+$settings['file_scan_ignore_directories'] = [
+  'node_modules',
+  'bower_components',
+];
 
-// Set Drupal not to check for HTTP connectivity.
-$conf['drupal_http_request_fails'] = FALSE;
+// The hash_salt should be a unique random value for each application.
+// If left unset, the settings.platformsh.php file will attempt to provide one.
+// You can also provide a specific value here if you prefer and it will be used
+// instead. In most cases it's best to leave this blank on Platform.sh. You
+// can configure a separate hash_salt in your settings.local.php file for
+// local development.
+// $settings['hash_salt'] = 'change_me';
 
-// Include automatic Platform.sh settings.
-if (file_exists(__DIR__ . '/settings.platformsh.php')) {
-  require_once(__DIR__ . '/settings.platformsh.php');
+// Set up a config sync directory.
+//
+// This is defined inside the read-only "config" directory, deployed via Git.
+$config_directories[CONFIG_SYNC_DIRECTORY] = '../config/sync';
+
+// Automatic Platform.sh settings.
+if (file_exists($app_root . '/' . $site_path . '/settings.platformsh.php')) {
+  include $app_root . '/' . $site_path . '/settings.platformsh.php';
 }
 
-// Include local settings. These come last so that they can override anything.
-$on_platformsh = getenv('PLATFORM_PROJECT') !== FALSE;
-if (file_exists(__DIR__ . '/settings.local.php') && !$on_platformsh) {
-  require_once(__DIR__ . '/settings.local.php');
+// Local settings. These come last so that they can override anything.
+if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
+  include $app_root . '/' . $site_path . '/settings.local.php';
 }

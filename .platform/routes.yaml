@@ -7,9 +7,10 @@
     type: upstream
     upstream: "app:http"
     cache:
-        enabled: true
-        # Base the cache on the session cookie. Ignore all other cookies.
-        cookies: ['/^SS?ESS/']
+      enabled: true
+
+      # Base the cache on the session cookie and custom Drupal cookies. Ignore all other cookies.
+      cookies: ['/^SS?ESS/', '/^Drupal.visitor/']
 
 "https://www.{default}/":
     type: redirect

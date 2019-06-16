@@ -5,11 +5,7 @@
 
 mysqldb:
     type: mysql:10.2
-    disk: 6096
+    disk: 2048
 
-#rediscache:
-#    type: redis:3.0
-#
-#solrsearch:
-#    type: solr:3.6
-#    disk: 1024
+rediscache:
+    type: redis:5.0
