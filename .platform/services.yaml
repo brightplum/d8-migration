@@ -3,7 +3,7 @@
 # Each service listed will be deployed
 # to power your Platform.sh project.
 
-mysqldb:
+database1:
     type: mysql:10.2
     disk: 2048
 

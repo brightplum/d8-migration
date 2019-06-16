@@ -1,5 +1,6 @@
 name: app
-recipe: drupal7
+recipe: drupal8
 config:
   webroot: web
   via: nginx
+  database: mariadb:10.1
