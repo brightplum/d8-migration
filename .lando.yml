@@ -1,4 +1,4 @@
-name: app
+name: commondreams-d8
 recipe: drupal8
 config:
   webroot: web
