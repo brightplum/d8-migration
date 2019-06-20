@@ -1,11 +1,12 @@
 name: Common Dreams Migration
 type: profile
 description: 'CD Migration to auto-enable modules'
+core: 8.x
 
 # Modules to install to support the profile.
 install:
   - history
-  - actions
+  - action
   - block_content
   - breakpoint
   - config
@@ -47,7 +48,6 @@ install:
   - amp
   - applenews
   - context
-  - file_entity
   - htmlpurifier
   - imce
   - linkit
