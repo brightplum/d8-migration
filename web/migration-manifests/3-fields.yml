@@ -1,9 +1,10 @@
 #fields
 - upgrade_d7_field
 - upgrade_d7_field_instance
-- upgrade_d7_view_modes
+- upgrade_d7_field_instance_widget_settings
 
 # 535 items
 - upgrade_d7_field_formatter_settings
 
-- upgrade_d7_field_instance_widget_settings
+- upgrade_d7_view_modes
+- upgrade_d7_node_title_label
