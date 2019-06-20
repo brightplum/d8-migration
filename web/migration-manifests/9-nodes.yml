@@ -9,27 +9,7 @@
 # 123 items
 - upgrade_d7_applenews_article
 
-# 3197 items
-- upgrade_d7_node_video_article
-
-# 11061 items
-- upgrade_d7_node_further
-
-# 36276 items
-- upgrade_d7_node_headline
-
-# 26836 items
-- upgrade_d7_node_newswire
-
-# 45639 items
-- upgrade_d7_node_views_article
-
 - upgrade_d7_node_revision_breaking_news
 - upgrade_d7_node_revision_fundraising_appeals
-- upgrade_d7_node_revision_further
-- upgrade_d7_node_revision_headline
-- upgrade_d7_node_revision_newswire
 - upgrade_d7_node_revision_page
 - upgrade_d7_node_revision_special_coverage
-- upgrade_d7_node_revision_video_article
-- upgrade_d7_node_revision_views_article

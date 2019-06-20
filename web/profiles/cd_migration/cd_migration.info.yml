@@ -1,0 +1,84 @@
+name: Common Dreams Migration
+type: profile
+description: 'CD Migration to auto-enable modules'
+
+# Modules to install to support the profile.
+install:
+  - history
+  - actions
+  - block_content
+  - breakpoint
+  - config
+  - comment
+  - contextual
+  - contact
+  - quickedit
+  - help
+  - text
+  - image
+  - options
+  - datetime
+  - datetime_range
+  - entity_reference
+  - path
+  - taxonomy
+  - dblog
+  - search
+  - shortcut
+  - toolbar
+  - field_ui
+  - file
+  - rdf
+  - views
+  - views_ui
+  - editor
+  - ckeditor
+  - filter
+  - link
+  - media
+  - menu_link_content
+  - migrate
+  - migrate_drupal
+  - migrate_plus
+  - migrate_tools
+  - migrate_manifest
+  - migrate_upgrade
+  - advagg
+  - amp
+  - applenews
+  - context
+  - file_entity
+  - htmlpurifier
+  - imce
+  - linkit
+  - metatag
+  - panels
+  - pathauto
+  - redirect
+  - robotstxt
+  - search_api
+  - search_api_solr
+  - smart_trim
+  - taxonomy_manager
+  - taxonomy_menu
+  - term_merge
+  - token_filter
+  - views_bulk_operations
+  - xmlsitemap
+
+# Required modules
+# Note that any dependencies of the modules listed here will be installed automatically.
+dependencies:
+  - node
+  - field
+  - user
+  - block
+  - views
+  - ctools
+  - token
+
+# List any themes that should be installed as part of the profile installation.
+# Note that this will not set any theme as the default theme.
+themes:
+  - bartik
+  - seven
