@@ -16,6 +16,7 @@ type: 'php:7.2'
 # side is in the form `<service name>:<endpoint name>`.
 relationships:
     database: 'mysqldb:mysql'
+    imports: "mysqldb:importer"
 ## Uncomment this line to enable Redis caching for Drupal.
 #    redis: 'rediscache:redis'
 

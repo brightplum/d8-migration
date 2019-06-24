@@ -6,6 +6,20 @@
 mysqldb:
     type: mysql:10.2
     disk: 2048
+    configuration:
+        schemas:
+            - main
+            - legacy
+        endpoints:
+            admin:
+                default_schema: main
+                privileges:
+                    main: admin
+                    legacy: admin
+            importer:
+                default_schema: legacy
+                privileges:
+                    legacy: rw
 
 rediscache:
     type: redis:5.0
