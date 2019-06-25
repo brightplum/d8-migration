@@ -19,7 +19,7 @@ mysqldb:
             importer:
                 default_schema: legacy
                 privileges:
-                    legacy: rw
+                    legacy: admin
 
 rediscache:
     type: redis:5.0
