@@ -5,7 +5,7 @@
 
 mysqldb:
     type: mysql:10.2
-    disk: 6144
+    disk: 8192
     configuration:
         schemas:
             - main
