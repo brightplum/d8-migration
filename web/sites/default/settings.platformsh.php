@@ -23,7 +23,7 @@ $databases['default']['default'] = [
 ];
 
 $creds = $platformsh->credentials('imports');
-$databases['d7']['default'] = [
+$databases['upgrade']['default'] = [
   'driver' => $creds['scheme'],
   'database' => $creds['path'],
   'username' => $creds['username'],
