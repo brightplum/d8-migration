@@ -1,0 +1,18 @@
+uuid: e3dd52c1-1afe-4b2e-89a4-0f83b00869b7
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main-menu
+    parent: 'main-menu:0:'
+name: Further
+type: further
+description: 'Further entries for the home page first column.'
+help: ''
+new_revision: false
+preview_mode: 1
+display_submitted: false

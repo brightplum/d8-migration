@@ -1,0 +1,15 @@
+uuid: bbefbb8a-0580-4f90-830f-d69ed5ced2c9
+langcode: en
+status: true
+dependencies: {  }
+name: half_width
+label: 'Content half width'
+effects:
+  ef6f090f-0dbd-4f4a-9969-06d6a4f6e582:
+    uuid: ef6f090f-0dbd-4f4a-9969-06d6a4f6e582
+    id: image_scale
+    weight: 1
+    data:
+      width: 480
+      height: null
+      upscale: true

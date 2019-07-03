@@ -1,0 +1,23 @@
+uuid: 51b17099-e406-4878-a91e-0505c7412566
+langcode: en
+status: true
+dependencies: {  }
+name: cd_special_coverage
+label: 'CD Special Coverage (420x220)'
+effects:
+  b50a9059-6f57-470c-af69-aad52b12aa0e:
+    uuid: b50a9059-6f57-470c-af69-aad52b12aa0e
+    id: image_scale
+    weight: 0
+    data:
+      width: 420
+      height: null
+      upscale: true
+  82ce09eb-3c13-4f20-b832-280717ce519f:
+    uuid: 82ce09eb-3c13-4f20-b832-280717ce519f
+    id: image_crop
+    weight: 1
+    data:
+      width: 420
+      height: 220
+      anchor: center-center

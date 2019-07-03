@@ -1,0 +1,16 @@
+uuid: 54b5283b-e89f-4af3-b0ca-710beeec2cde
+langcode: en
+status: true
+dependencies: {  }
+name: wayback_image
+label: 'wayback image'
+effects:
+  2ce4361c-c93e-4348-8a07-bdcbb3bb14cf:
+    uuid: 2ce4361c-c93e-4348-8a07-bdcbb3bb14cf
+    id: image_scale
+    weight: 1
+    data:
+      width: null
+      height: 250
+      upscale: true
+      '#imageinfo_cache_effect_callback': image_scale_effect

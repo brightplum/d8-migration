@@ -1,0 +1,22 @@
+uuid: 13166655-a606-435f-aeea-6a084ce925f2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.body
+    - node.type.fundraising_appeals
+  module:
+    - text
+id: node.fundraising_appeals.body
+field_name: body
+entity_type: node
+bundle: fundraising_appeals
+label: Body
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: true
+field_type: text_with_summary

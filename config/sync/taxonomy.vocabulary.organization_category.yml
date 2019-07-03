@@ -1,0 +1,8 @@
+uuid: 23ba2070-7910-483d-970b-ed17832e59c9
+langcode: en
+status: true
+dependencies: {  }
+name: 'Organization Category'
+vid: organization_category
+description: 'Category which organizations can be tagged with.'
+weight: 0

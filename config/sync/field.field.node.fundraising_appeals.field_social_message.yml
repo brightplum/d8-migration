@@ -1,0 +1,21 @@
+uuid: c2e87782-d590-49d0-bacc-f3357da29f52
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_social_message
+    - node.type.fundraising_appeals
+id: node.fundraising_appeals.field_social_message
+field_name: field_social_message
+entity_type: node
+bundle: fundraising_appeals
+label: 'Social Message'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 'Common Dreams is a small non-profit that exists only because of the support of our readers. No advertising; no paywalls: our content is free. But our costs are real. Without your support, we will not exist.'
+default_value_callback: ''
+settings: {  }
+field_type: string

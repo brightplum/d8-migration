@@ -1,0 +1,15 @@
+uuid: c6e2a3cd-4c78-4b61-90f7-596897ea77c3
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - amp
+  module:
+    - node
+_core:
+  default_config_hash: jwz6mIS1UN65x5-pQ4hpLguWSwuhZq62hXOoW_W5ysA
+id: node.amp
+label: amp
+targetEntityType: node
+cache: true

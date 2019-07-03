@@ -1,0 +1,8 @@
+uuid: 423fa20e-fffd-4a1b-983a-57cabbc66c2d
+langcode: en
+status: true
+dependencies: {  }
+id: comment_node_views_article
+label: 'Views comment'
+target_entity_type_id: node
+description: null

@@ -1,0 +1,21 @@
+uuid: b4fc7bfe-1925-48cc-a651-df97c73d58a2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_subhead_2
+    - node.type.newswire
+  module:
+    - text
+id: node.newswire.field_subhead_2
+field_name: field_subhead_2
+entity_type: node
+bundle: newswire
+label: '2nd Subtitle'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text_long

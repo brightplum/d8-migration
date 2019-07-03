@@ -1,0 +1,21 @@
+uuid: cddaa694-95b5-4969-ad11-47090962aeb5
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node_newswire
+label: 'Content - Newswire article'
+type: 'canonical_entities:node'
+pattern: 'newswire/[node:field-article-date:custom:Y]/[node:field-article-date:custom:m]/[node:field-article-date:custom:d]/[node:title]'
+selection_criteria:
+  -
+    id: node_type
+    bundles:
+      newswire: newswire
+    negate: false
+    context_mapping:
+      node: node
+selection_logic: and
+weight: 0
+relationships: {  }

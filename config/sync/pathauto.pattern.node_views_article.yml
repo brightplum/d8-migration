@@ -1,0 +1,21 @@
+uuid: 1111d646-2fa5-4ac9-b010-7f73f31a0cf9
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node_views_article
+label: 'Content - Views'
+type: 'canonical_entities:node'
+pattern: 'views/[node:field-article-date:custom:Y]/[node:field-article-date:custom:m]/[node:field-article-date:custom:d]/[node:title]'
+selection_criteria:
+  -
+    id: node_type
+    bundles:
+      views_article: views_article
+    negate: false
+    context_mapping:
+      node: node
+selection_logic: and
+weight: 0
+relationships: {  }

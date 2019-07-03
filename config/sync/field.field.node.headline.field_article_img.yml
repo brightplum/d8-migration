@@ -1,0 +1,38 @@
+uuid: 2f120285-f195-4f05-b470-2d36a0893e28
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_article_img
+    - node.type.headline
+  module:
+    - image
+id: node.headline.field_article_img
+field_name: field_article_img
+entity_type: node
+bundle: headline
+label: 'Article Image'
+description: 'Image size info can go here'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  file_directory: headlines
+  file_extensions: 'png gif jpg jpeg'
+  max_filesize: ''
+  max_resolution: ''
+  min_resolution: ''
+  alt_field: true
+  title_field: false
+  default_image:
+    alt: ''
+    title: ''
+    width: null
+    height: null
+    uuid: ''
+  alt_field_required: true
+  title_field_required: false
+  handler: 'default:file'
+  handler_settings: {  }
+field_type: image

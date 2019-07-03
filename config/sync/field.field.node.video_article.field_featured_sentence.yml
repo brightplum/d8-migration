@@ -1,0 +1,19 @@
+uuid: 70084338-66df-498d-a933-325aafcac36b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_featured_sentence
+    - node.type.video_article
+id: node.video_article.field_featured_sentence
+field_name: field_featured_sentence
+entity_type: node
+bundle: video_article
+label: 'Featured home page video sentence'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

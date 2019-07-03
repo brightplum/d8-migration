@@ -1,0 +1,8 @@
+uuid: 35a6e000-7032-4948-a498-09a6c74f5c6e
+langcode: en
+status: true
+dependencies: {  }
+name: Tags
+vid: topic
+description: 'For tagging articles with multiple freeform tags.'
+weight: -6

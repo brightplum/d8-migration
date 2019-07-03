@@ -1,0 +1,19 @@
+uuid: f559871d-70f1-405f-919a-0352dbe84192
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_hp_title
+    - node.type.newswire
+id: node.newswire.field_hp_title
+field_name: field_hp_title
+entity_type: node
+bundle: newswire
+label: 'Home page title'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

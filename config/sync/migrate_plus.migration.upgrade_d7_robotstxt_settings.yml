@@ -1,0 +1,29 @@
+uuid: 6cc1ae3d-0551-42d8-b237-6e4dc3592a5b
+langcode: en
+status: true
+dependencies: {  }
+id: upgrade_d7_robotstxt_settings
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+  - Configuration
+migration_group: migrate_drupal_7
+label: 'RobotsTxt 7 configuration'
+source:
+  plugin: variable
+  variables:
+    - robotstxt
+  source_module: robotstxt
+process:
+  content:
+    -
+      plugin: get
+      source: robotstxt
+destination:
+  plugin: config
+  config_name: robotstxt.settings
+migration_dependencies:
+  required: {  }
+  optional: {  }

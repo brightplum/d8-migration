@@ -1,0 +1,22 @@
+uuid: 1572595c-70a8-4830-92de-44f2ce420ab9
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.body
+    - node.type.further
+  module:
+    - text
+id: node.further.body
+field_name: body
+entity_type: node
+bundle: further
+label: Body
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: true
+field_type: text_with_summary

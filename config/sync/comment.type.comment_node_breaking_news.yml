@@ -1,0 +1,8 @@
+uuid: 4b8b5ae0-d076-48c0-960c-9f282ebce6c2
+langcode: en
+status: true
+dependencies: {  }
+id: comment_node_breaking_news
+label: 'Breaking News comment'
+target_entity_type_id: node
+description: null

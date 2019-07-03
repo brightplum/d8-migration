@@ -1,0 +1,21 @@
+uuid: 3cf1d334-cca2-4bc2-9267-05f567b9e258
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_topics
+    - node.type.newswire
+id: node.newswire.field_topics
+field_name: field_topics
+entity_type: node
+bundle: newswire
+label: Tags
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings: {  }
+field_type: entity_reference

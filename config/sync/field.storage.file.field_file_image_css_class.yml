@@ -1,0 +1,27 @@
+uuid: 43913fe0-81d9-4457-bd79-d0c2565086d8
+langcode: und
+status: true
+dependencies:
+  module:
+    - file
+    - options
+id: file.field_file_image_css_class
+field_name: field_file_image_css_class
+entity_type: file
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: image-left
+      label: 'Align image left'
+    -
+      value: image-right
+      label: 'Align image right'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

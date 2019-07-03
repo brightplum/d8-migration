@@ -1,0 +1,16 @@
+uuid: 493c2772-4578-4ff8-9543-515a9daaa0a6
+langcode: en
+status: true
+dependencies: {  }
+name: cd_further_sharing
+label: 'CD FURTHER sharing'
+effects:
+  f3bae5d2-2078-4244-bc87-c072d81c243a:
+    uuid: f3bae5d2-2078-4244-bc87-c072d81c243a
+    id: image_scale
+    weight: 1
+    data:
+      width: 640
+      height: null
+      upscale: true
+      '#imageinfo_cache_effect_callback': image_scale_effect

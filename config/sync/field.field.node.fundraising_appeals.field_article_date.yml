@@ -1,0 +1,19 @@
+uuid: 26259c17-61b4-436c-8e6f-b8225142243e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_article_date
+    - node.type.fundraising_appeals
+id: node.fundraising_appeals.field_article_date
+field_name: field_article_date
+entity_type: node
+bundle: fundraising_appeals
+label: date
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: timestamp

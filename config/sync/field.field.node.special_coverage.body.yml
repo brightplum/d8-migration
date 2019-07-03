@@ -1,0 +1,22 @@
+uuid: 1c6696da-c957-408f-80b1-373f37bdb376
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.body
+    - node.type.special_coverage
+  module:
+    - text
+id: node.special_coverage.body
+field_name: body
+entity_type: node
+bundle: special_coverage
+label: Body
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: true
+field_type: text_with_summary

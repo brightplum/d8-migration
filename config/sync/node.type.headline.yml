@@ -1,0 +1,18 @@
+uuid: 963d547f-9822-43f8-9c8b-c54fc0be53ba
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main-menu
+    parent: 'main-menu:0:'
+name: News
+type: headline
+description: 'An article that will appear in the "News/Headlines" section of the site.'
+help: ''
+new_revision: false
+preview_mode: 1
+display_submitted: false

@@ -1,0 +1,17 @@
+uuid: 7c78da48-4618-43eb-bb1b-910a79f1ac00
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: dJ0L2DNSj5q6XVZAGsuVDpJTh5UeYkIPwKrUOOpr8YI
+id: authenticated
+label: 'authenticated user'
+weight: 1
+is_admin: false
+permissions:
+  - 'access content'
+  - 'change own username'
+  - 'search content'
+  - 'use text format filtered_html'
+  - 'view disqus comments'
+  - 'view files'

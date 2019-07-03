@@ -1,0 +1,101 @@
+uuid: d3f8ec30-6be0-4ee7-83c7-4ab01b387df4
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_display.comment.comment_node_further.default
+    - field.field.node.further.body
+    - field.field.node.further.comment_node_further
+    - field.field.node.further.field_article_date
+    - field.field.node.further.field_author_bio
+    - field.field.node.further.field_author_name
+    - field.field.node.further.field_hp_title
+    - field.field.node.further.field_image
+    - field.field.node.further.field_menu_categories
+    - field.field.node.further.field_more_text
+    - field.field.node.further.field_src_url
+    - field.field.node.further.field_topics
+    - node.type.further
+  module:
+    - comment
+    - datetime
+    - link
+    - text
+    - user
+id: node.further.default
+targetEntityType: node
+bundle: further
+mode: default
+content:
+  body:
+    label: hidden
+    weight: 6
+    type: text_default
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  comment_node_further:
+    label: hidden
+    type: comment_default
+    weight: 20
+    settings:
+      view_mode: default
+      pager_id: 0
+    third_party_settings: {  }
+    region: content
+  field_article_date:
+    label: hidden
+    weight: 1
+    type: datetime_default
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    region: content
+  field_author_name:
+    label: hidden
+    weight: 2
+    type: string
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    region: content
+  field_menu_categories:
+    label: hidden
+    weight: 1
+    type: entity_reference_label
+    settings:
+      link: true
+    third_party_settings: {  }
+    region: content
+  field_src_url:
+    label: above
+    weight: 12
+    type: link
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    region: content
+  field_topics:
+    label: hidden
+    weight: 9
+    type: entity_reference_label
+    settings:
+      link: true
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  field_author_bio: true
+  field_hp_title: true
+  field_image: true
+  field_more_text: true
+  langcode: true

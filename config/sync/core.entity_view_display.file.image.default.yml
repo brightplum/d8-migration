@@ -1,0 +1,20 @@
+uuid: 2d033a66-936f-444e-bacd-8ad3f7ba1c3a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.file.image.field_file_image_alt_text
+    - field.field.file.image.field_file_image_css_class
+    - field.field.file.image.field_file_image_title_text
+  module:
+    - file
+id: file.image.default
+targetEntityType: file
+bundle: image
+mode: default
+content: {  }
+hidden:
+  field_file_image_alt_text: true
+  field_file_image_css_class: true
+  field_file_image_title_text: true
+  langcode: true

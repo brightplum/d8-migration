@@ -1,0 +1,21 @@
+uuid: d2c815a7-d847-4ce1-93f6-f52761f4c762
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node_further
+label: 'Content - Further'
+type: 'canonical_entities:node'
+pattern: 'further/[node:field-article-date:custom:Y]/[node:field-article-date:custom:m]/[node:field-article-date:custom:d]/[node:title]'
+selection_criteria:
+  -
+    id: node_type
+    bundles:
+      further: further
+    negate: false
+    context_mapping:
+      node: node
+selection_logic: and
+weight: 0
+relationships: {  }

@@ -1,0 +1,38 @@
+uuid: 23896f15-569a-4962-8b50-5bc88808ca1a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_image
+    - node.type.further
+  module:
+    - image
+id: node.further.field_image
+field_name: field_image
+entity_type: node
+bundle: further
+label: 'Homepage thumbnail'
+description: 'Thumbnail used to display in homepage block. Will also be used by social media services that respond to Open Graph tags (ie Facebook recommended block).'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  file_directory: further
+  file_extensions: 'png gif jpg jpeg'
+  max_filesize: ''
+  max_resolution: ''
+  min_resolution: 640x335
+  alt_field: true
+  title_field: false
+  default_image:
+    alt: ''
+    title: ''
+    width: null
+    height: null
+    uuid: ''
+  alt_field_required: true
+  title_field_required: false
+  handler: 'default:file'
+  handler_settings: {  }
+field_type: image

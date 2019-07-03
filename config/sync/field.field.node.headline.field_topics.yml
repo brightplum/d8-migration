@@ -1,0 +1,21 @@
+uuid: 1e1c0d62-8f81-4d4a-a8cb-1c3e191841cb
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_topics
+    - node.type.headline
+id: node.headline.field_topics
+field_name: field_topics
+entity_type: node
+bundle: headline
+label: Tags
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings: {  }
+field_type: entity_reference

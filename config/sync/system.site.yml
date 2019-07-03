@@ -1,0 +1,14 @@
+uuid: ca2a3b10-53f4-47d9-9fd4-079b3b14d29b
+name: 'Common Dreams'
+mail: info@commondreams.org
+slogan: 'Breaking News & Views for the Progressive Community'
+page:
+  403: /
+  404: /404-error
+  front: /home
+admin_compact_mode: false
+weight_select_max: 100
+langcode: en
+default_langcode: en
+_core:
+  default_config_hash: yXadRE77Va-G6dxhd2kPYapAvbnSvTF6hO4oXiOEynI

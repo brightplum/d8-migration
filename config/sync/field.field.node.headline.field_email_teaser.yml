@@ -1,0 +1,21 @@
+uuid: 7a3adfd8-c555-4ad4-9d0d-98dc27656347
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_email_teaser
+    - node.type.headline
+  module:
+    - text
+id: node.headline.field_email_teaser
+field_name: field_email_teaser
+entity_type: node
+bundle: headline
+label: '**Email Teaser**'
+description: 'Email Newsletter Text'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text

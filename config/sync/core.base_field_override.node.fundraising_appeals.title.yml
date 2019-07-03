@@ -1,0 +1,18 @@
+uuid: 7773276f-0de5-4960-abc0-ed3c8aa9d0b1
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.fundraising_appeals
+id: node.fundraising_appeals.title
+field_name: title
+entity_type: node
+bundle: fundraising_appeals
+label: Title
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

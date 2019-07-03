@@ -1,0 +1,23 @@
+uuid: 685e4346-34e2-490a-b441-df46bcaafd7e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_src_url
+    - node.type.video_article
+  module:
+    - link
+id: node.video_article.field_src_url
+field_name: field_src_url
+entity_type: node
+bundle: video_article
+label: 'Source title & URL'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 17
+field_type: link

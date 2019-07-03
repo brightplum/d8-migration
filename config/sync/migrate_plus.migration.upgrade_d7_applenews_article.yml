@@ -1,0 +1,62 @@
+uuid: 8c570f31-ad18-4669-8518-d4d4c0656d5f
+langcode: en
+status: true
+dependencies: {  }
+id: upgrade_d7_applenews_article
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+  - Content
+migration_group: migrate_drupal_7
+label: 'Apple News Article'
+source:
+  plugin: d7_applenews_article
+  constants:
+    type: article
+process:
+  uuid:
+    -
+      plugin: get
+      source: article_id
+  entity_id:
+    -
+      plugin: get
+      source: entity_id
+  entity_type:
+    -
+      plugin: get
+      source: entity_type
+  field_name:
+    -
+      plugin: applenews_field_name
+  id:
+    -
+      plugin: get
+      source: article_id
+  revision:
+    -
+      plugin: get
+      source: article_revision_id
+  createdAt:
+    -
+      plugin: get
+      source: postdate
+  type:
+    -
+      plugin: get
+      source: constants/type
+  shareUrl:
+    -
+      plugin: get
+      source: share_url
+  links:
+    -
+      plugin: get
+      source: links
+destination:
+  plugin: 'entity:applenews_article'
+migration_dependencies:
+  required: {  }
+  optional: {  }

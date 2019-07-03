@@ -1,0 +1,22 @@
+uuid: e1b9fb9e-a1be-49cc-91d5-f643b3166648
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_desc
+    - node.type.newswire
+  module:
+    - text
+id: node.newswire.field_desc
+field_name: field_desc
+entity_type: node
+bundle: newswire
+label: 'Description / Mission statement'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: false
+field_type: text_with_summary

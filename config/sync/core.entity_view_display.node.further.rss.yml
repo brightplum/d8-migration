@@ -1,0 +1,50 @@
+uuid: 56b6829a-89fd-409b-9666-4156dfdcf281
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.rss
+    - field.field.node.further.body
+    - field.field.node.further.field_article_date
+    - field.field.node.further.field_author_bio
+    - field.field.node.further.field_author_name
+    - field.field.node.further.field_hp_title
+    - field.field.node.further.field_image
+    - field.field.node.further.field_menu_categories
+    - field.field.node.further.field_more_text
+    - field.field.node.further.field_src_url
+    - field.field.node.further.field_topics
+    - node.type.further
+  module:
+    - image
+    - user
+id: node.further.rss
+targetEntityType: node
+bundle: further
+mode: rss
+content:
+  field_image:
+    label: hidden
+    weight: 3
+    type: image
+    settings:
+      image_style: ''
+      image_link: ''
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  body: true
+  field_article_date: true
+  field_author_bio: true
+  field_author_name: true
+  field_hp_title: true
+  field_menu_categories: true
+  field_more_text: true
+  field_src_url: true
+  field_topics: true
+  langcode: true

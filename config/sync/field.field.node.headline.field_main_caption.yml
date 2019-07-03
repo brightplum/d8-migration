@@ -1,0 +1,21 @@
+uuid: 36abbd34-c630-4e3c-9500-00bcd7629ca4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_main_caption
+    - node.type.headline
+  module:
+    - text
+id: node.headline.field_main_caption
+field_name: field_main_caption
+entity_type: node
+bundle: headline
+label: 'Main Image Caption'
+description: 'This is the caption that appears under the primary article image on the display page. This is to allow long captions to appear under the main / primary article image.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text_long

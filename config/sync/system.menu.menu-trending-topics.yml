@@ -1,0 +1,8 @@
+uuid: 87851e66-80c3-4271-996a-a03c4caff516
+langcode: en
+status: true
+dependencies: {  }
+id: menu-trending-topics
+label: Trending
+description: 'Topics that are currently trending and are promoted to the top of the page.'
+locked: false

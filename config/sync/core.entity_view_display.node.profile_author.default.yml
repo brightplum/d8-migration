@@ -1,0 +1,29 @@
+uuid: dc305a34-84a5-4585-bb1f-8d2fb405e943
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.profile_author.body
+    - node.type.profile_author
+  module:
+    - text
+    - user
+id: node.profile_author.default
+targetEntityType: node
+bundle: profile_author
+mode: default
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 101
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  langcode: true

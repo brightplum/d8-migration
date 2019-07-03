@@ -1,0 +1,21 @@
+uuid: 799bf0c2-9dee-4b02-ac0d-f1657d633644
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_menu_categories
+    - node.type.headline
+id: node.headline.field_menu_categories
+field_name: field_menu_categories
+entity_type: node
+bundle: headline
+label: Category
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings: {  }
+field_type: entity_reference

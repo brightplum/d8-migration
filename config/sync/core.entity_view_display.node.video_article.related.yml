@@ -1,0 +1,43 @@
+uuid: b0e18dc1-56dc-4c96-803d-8f760e4ed4a2
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.related
+    - field.field.node.video_article.body
+    - field.field.node.video_article.field_article_date
+    - field.field.node.video_article.field_author_name
+    - field.field.node.video_article.field_featured_sentence
+    - field.field.node.video_article.field_hp_title
+    - field.field.node.video_article.field_image
+    - field.field.node.video_article.field_menu_categories
+    - field.field.node.video_article.field_social_media_image
+    - field.field.node.video_article.field_src_url
+    - field.field.node.video_article.field_topics
+    - field.field.node.video_article.field_video_text
+    - node.type.video_article
+  module:
+    - user
+id: node.video_article.related
+targetEntityType: node
+bundle: video_article
+mode: related
+content:
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  body: true
+  field_article_date: true
+  field_author_name: true
+  field_featured_sentence: true
+  field_hp_title: true
+  field_image: true
+  field_menu_categories: true
+  field_social_media_image: true
+  field_src_url: true
+  field_topics: true
+  field_video_text: true
+  langcode: true

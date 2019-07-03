@@ -1,0 +1,21 @@
+uuid: fa180d15-2bbd-4b98-9c08-3055f87eb3ad
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_location
+    - node.type.newswire
+id: node.newswire.field_location
+field_name: field_location
+entity_type: node
+bundle: newswire
+label: Location
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: WASHINGTON
+default_value_callback: ''
+settings: {  }
+field_type: string

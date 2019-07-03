@@ -1,0 +1,14 @@
+uuid: f10550ce-7404-44a2-b1e1-fe645fab26bc
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.cd_admin
+  module:
+    - user
+id: user_remove_role_action.cd_admin
+label: 'Remove the cd admin role from the selected user(s)'
+type: user
+plugin: user_remove_role_action
+configuration:
+  rid: cd_admin

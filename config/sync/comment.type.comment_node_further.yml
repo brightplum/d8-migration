@@ -1,0 +1,8 @@
+uuid: 74e3c72b-94bf-43ee-8c51-c4773c3b18b6
+langcode: en
+status: true
+dependencies: {  }
+id: comment_node_further
+label: 'Further comment'
+target_entity_type_id: node
+description: null

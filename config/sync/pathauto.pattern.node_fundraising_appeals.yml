@@ -1,0 +1,21 @@
+uuid: 2474a887-0a94-49c5-ae60-929962843883
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node_fundraising_appeals
+label: 'Content - Fundraising Appeals'
+type: 'canonical_entities:node'
+pattern: 'appeal/[node:title]'
+selection_criteria:
+  -
+    id: node_type
+    bundles:
+      fundraising_appeals: fundraising_appeals
+    negate: false
+    context_mapping:
+      node: node
+selection_logic: and
+weight: 0
+relationships: {  }

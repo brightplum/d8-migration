@@ -1,0 +1,21 @@
+uuid: dc6c69d5-c6dc-445d-b42f-f030ad0922ff
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_email_teaser
+    - node.type.views_article
+  module:
+    - text
+id: node.views_article.field_email_teaser
+field_name: field_email_teaser
+entity_type: node
+bundle: views_article
+label: '**Email Teaser**'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text

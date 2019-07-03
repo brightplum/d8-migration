@@ -1,0 +1,8 @@
+uuid: 2d5c8047-4361-44ca-87b6-dbbd4532b2f0
+langcode: en
+status: true
+dependencies: {  }
+id: comment_node_special_coverage
+label: 'Special Coverage comment'
+target_entity_type_id: node
+description: null

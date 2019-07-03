@@ -1,0 +1,21 @@
+uuid: acb43d0d-cb51-47cd-80cc-7a440fa95b3e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_video_text
+    - node.type.video_article
+  module:
+    - text
+id: node.video_article.field_video_text
+field_name: field_video_text
+entity_type: node
+bundle: video_article
+label: 'Video embed  code'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text_long

@@ -1,0 +1,21 @@
+uuid: f41b07b0-2258-48b7-bc97-fc45ade031c8
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node_headline
+label: 'Content - News'
+type: 'canonical_entities:node'
+pattern: 'news/[node:field-article-date:custom:Y]/[node:field-article-date:custom:m]/[node:field-article-date:custom:d]/[node:title]'
+selection_criteria:
+  -
+    id: node_type
+    bundles:
+      headline: headline
+    negate: false
+    context_mapping:
+      node: node
+selection_logic: and
+weight: 0
+relationships: {  }

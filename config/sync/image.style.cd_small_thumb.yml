@@ -1,0 +1,23 @@
+uuid: 43f4c2e2-c036-43d4-8227-cfaa8c88313c
+langcode: en
+status: true
+dependencies: {  }
+name: cd_small_thumb
+label: 'CD Small Thumb (191x100)'
+effects:
+  0d6890b3-b46a-42df-a445-2b7ac67dbfa2:
+    uuid: 0d6890b3-b46a-42df-a445-2b7ac67dbfa2
+    id: image_scale
+    weight: 0
+    data:
+      width: 191
+      height: null
+      upscale: true
+  91b5a0d2-a494-4f7e-ba69-57a479bd16bd:
+    uuid: 91b5a0d2-a494-4f7e-ba69-57a479bd16bd
+    id: image_crop
+    weight: 1
+    data:
+      width: 191
+      height: 100
+      anchor: center-center

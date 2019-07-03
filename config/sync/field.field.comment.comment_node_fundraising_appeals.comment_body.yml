@@ -1,0 +1,21 @@
+uuid: 82298a6a-dcc3-44c0-80c9-7993191defbc
+langcode: en
+status: true
+dependencies:
+  config:
+    - comment.type.comment_node_fundraising_appeals
+    - field.storage.comment.comment_body
+  module:
+    - text
+id: comment.comment_node_fundraising_appeals.comment_body
+field_name: comment_body
+entity_type: comment
+bundle: comment_node_fundraising_appeals
+label: Comment
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text_long

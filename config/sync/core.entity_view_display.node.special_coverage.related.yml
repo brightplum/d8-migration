@@ -1,0 +1,23 @@
+uuid: 8eae00e2-07da-43e4-8588-e590edbd78ae
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.related
+    - field.field.node.special_coverage.body
+    - node.type.special_coverage
+  module:
+    - user
+id: node.special_coverage.related
+targetEntityType: node
+bundle: special_coverage
+mode: related
+content:
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  body: true
+  langcode: true

@@ -1,0 +1,38 @@
+uuid: 0ee9b41f-126f-4035-a760-e01482694da4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_image
+    - node.type.views_article
+  module:
+    - image
+id: node.views_article.field_image
+field_name: field_image
+entity_type: node
+bundle: views_article
+label: 'Homepage Thumbnail'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  file_directory: views-article/thumbs
+  file_extensions: 'png gif jpg jpeg'
+  max_filesize: ''
+  max_resolution: ''
+  min_resolution: ''
+  alt_field: true
+  title_field: false
+  default_image:
+    alt: ''
+    title: ''
+    width: null
+    height: null
+    uuid: ''
+  alt_field_required: true
+  title_field_required: false
+  handler: 'default:file'
+  handler_settings: {  }
+field_type: image

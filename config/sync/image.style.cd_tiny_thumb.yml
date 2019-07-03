@@ -1,0 +1,15 @@
+uuid: feb6c1fc-ebb6-44f7-869c-84b5923ac330
+langcode: en
+status: true
+dependencies: {  }
+name: cd_tiny_thumb
+label: 'CD Tiny Thumb'
+effects:
+  ecbdedaf-f8be-4520-804a-28f7c76a004b:
+    uuid: ecbdedaf-f8be-4520-804a-28f7c76a004b
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 100
+      height: 58
+      anchor: center-center

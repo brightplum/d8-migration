@@ -1,0 +1,18 @@
+uuid: a9ad91b0-2c6b-433d-9b3a-97ce017ae59a
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main-menu
+    parent: 'main-menu:0:'
+name: 'Special Coverage'
+type: special_coverage
+description: 'A Special Coverage Sidebar Block.'
+help: ''
+new_revision: false
+preview_mode: 1
+display_submitted: false

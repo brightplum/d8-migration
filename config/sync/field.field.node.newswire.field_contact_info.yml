@@ -1,0 +1,21 @@
+uuid: 5af43a6c-cc76-488b-946b-ea22b575e5fb
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_contact_info
+    - node.type.newswire
+  module:
+    - text
+id: node.newswire.field_contact_info
+field_name: field_contact_info
+entity_type: node
+bundle: newswire
+label: Contact
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text_long

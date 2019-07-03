@@ -1,0 +1,22 @@
+uuid: 975c1a2c-dddb-4236-8c7c-e3377a05fe79
+langcode: en
+status: true
+dependencies:
+  module:
+    - ctools
+    - taxonomy
+id: taxonomy_term_menu_categories
+label: 'Taxonomy term - Menu Categories'
+type: 'canonical_entities:taxonomy_term'
+pattern: '[term:name]'
+selection_criteria:
+  -
+    id: 'entity_bundle:taxonomy_term'
+    bundles:
+      menu_categories: menu_categories
+    negate: false
+    context_mapping:
+      taxonomy_term: taxonomy_term
+selection_logic: and
+weight: 0
+relationships: {  }

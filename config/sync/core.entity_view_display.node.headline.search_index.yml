@@ -1,0 +1,95 @@
+uuid: 3f21b69c-0cd7-4280-9e6f-8d079f6dbc0a
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.search_index
+    - field.field.node.headline.body
+    - field.field.node.headline.field_article_date
+    - field.field.node.headline.field_article_img
+    - field.field.node.headline.field_author_name
+    - field.field.node.headline.field_email_teaser
+    - field.field.node.headline.field_hp_author
+    - field.field.node.headline.field_hp_title
+    - field.field.node.headline.field_image
+    - field.field.node.headline.field_main_caption
+    - field.field.node.headline.field_menu_categories
+    - field.field.node.headline.field_social_media_image
+    - field.field.node.headline.field_src_url
+    - field.field.node.headline.field_topics
+    - node.type.headline
+  module:
+    - datetime
+    - link
+    - text
+    - user
+id: node.headline.search_index
+targetEntityType: node
+bundle: headline
+mode: search_index
+content:
+  body:
+    label: hidden
+    weight: 7
+    type: text_default
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_article_date:
+    label: hidden
+    weight: 1
+    type: datetime_default
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    region: content
+  field_author_name:
+    label: hidden
+    weight: 2
+    type: string
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    region: content
+  field_main_caption:
+    label: hidden
+    weight: 6
+    type: text_default
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_src_url:
+    label: hidden
+    weight: 2
+    type: link
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    region: content
+  field_topics:
+    label: hidden
+    weight: 12
+    type: entity_reference_label
+    settings:
+      link: true
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  field_article_img: true
+  field_email_teaser: true
+  field_hp_author: true
+  field_hp_title: true
+  field_image: true
+  field_menu_categories: true
+  field_social_media_image: true
+  langcode: true

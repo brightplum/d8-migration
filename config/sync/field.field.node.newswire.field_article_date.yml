@@ -1,0 +1,19 @@
+uuid: 49d537fd-783c-4bbe-9c52-dcc28111e76e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_article_date
+    - node.type.newswire
+id: node.newswire.field_article_date
+field_name: field_article_date
+entity_type: node
+bundle: newswire
+label: 'Authored on date'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: timestamp

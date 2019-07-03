@@ -1,0 +1,18 @@
+uuid: e4ea3166-0206-40d5-9e6b-de5939c5f89c
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.views_article
+id: node.views_article.title
+field_name: title
+entity_type: node
+bundle: views_article
+label: 'Article title'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,19 @@
+uuid: 398ff254-8f87-44c7-b5ed-e27b7fbf93c0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_article_date
+    - node.type.video_article
+id: node.video_article.field_article_date
+field_name: field_article_date
+entity_type: node
+bundle: video_article
+label: 'Authored on date'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: timestamp

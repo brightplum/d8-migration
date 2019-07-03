@@ -1,0 +1,19 @@
+uuid: 73163622-71e4-4172-a1db-640afea492f5
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_author_name
+    - node.type.video_article
+id: node.video_article.field_author_name
+field_name: field_author_name
+entity_type: node
+bundle: video_article
+label: 'Author name'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

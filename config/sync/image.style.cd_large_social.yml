@@ -1,0 +1,23 @@
+uuid: 4aa2edd1-f914-4aa7-a537-0a28bb10a0cc
+langcode: en
+status: true
+dependencies: {  }
+name: cd_large_social
+label: 'CD Large Social'
+effects:
+  fe1cda75-8b1a-4ba9-be3f-51d2fe8caaec:
+    uuid: fe1cda75-8b1a-4ba9-be3f-51d2fe8caaec
+    id: image_scale
+    weight: 1
+    data:
+      width: 955
+      height: null
+      upscale: true
+  8e48102c-0579-48f3-833b-ff46f5b9b503:
+    uuid: 8e48102c-0579-48f3-833b-ff46f5b9b503
+    id: image_crop
+    weight: 2
+    data:
+      width: 955
+      height: 478
+      anchor: center-center

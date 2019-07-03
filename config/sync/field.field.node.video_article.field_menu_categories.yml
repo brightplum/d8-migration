@@ -1,0 +1,21 @@
+uuid: b3462c30-d92a-4d77-a081-16a0a02dd17d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_menu_categories
+    - node.type.video_article
+id: node.video_article.field_menu_categories
+field_name: field_menu_categories
+entity_type: node
+bundle: video_article
+label: Categories
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings: {  }
+field_type: entity_reference

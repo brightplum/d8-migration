@@ -1,0 +1,22 @@
+uuid: ebb75618-062b-4233-8bf7-cb38e369879b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.body
+    - node.type.newswire
+  module:
+    - text
+id: node.newswire.body
+field_name: body
+entity_type: node
+bundle: newswire
+label: Body
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: true
+field_type: text_with_summary

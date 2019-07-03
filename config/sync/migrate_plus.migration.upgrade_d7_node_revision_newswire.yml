@@ -1,0 +1,157 @@
+uuid: dc87b5ed-f023-4910-862e-94f6ec2f9707
+langcode: en
+status: true
+dependencies: {  }
+id: upgrade_d7_node_revision_newswire
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: alterFieldWidgetMigration
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+  - Content
+migration_group: migrate_drupal_7
+label: 'Node revisions (Newswire article)'
+source:
+  plugin: d7_node_revision
+  node_type: newswire
+process:
+  nid:
+    -
+      plugin: get
+      source: nid
+  vid:
+    -
+      plugin: get
+      source: vid
+  langcode:
+    -
+      plugin: default_value
+      source: language
+      default_value: und
+  title:
+    -
+      plugin: get
+      source: title
+  uid:
+    -
+      plugin: get
+      source: node_uid
+  status:
+    -
+      plugin: get
+      source: status
+  created:
+    -
+      plugin: get
+      source: created
+  changed:
+    -
+      plugin: get
+      source: changed
+  promote:
+    -
+      plugin: get
+      source: promote
+  sticky:
+    -
+      plugin: get
+      source: sticky
+  revision_uid:
+    -
+      plugin: get
+      source: revision_uid
+  revision_log:
+    -
+      plugin: get
+      source: log
+  revision_timestamp:
+    -
+      plugin: get
+      source: timestamp
+  comment_node_newswire/0/status:
+    -
+      plugin: get
+      source: comment
+  body:
+    -
+      plugin: get
+      source: body
+  field_src_url:
+    -
+      plugin: field_link
+      source: field_src_url
+  field_desc:
+    -
+      plugin: get
+      source: field_desc
+  field_location:
+    -
+      plugin: get
+      source: field_location
+  field_hp_title:
+    -
+      plugin: get
+      source: field_hp_title
+  field_menu_categories:
+    -
+      plugin: sub_process
+      source: field_menu_categories
+      process:
+        target_id: tid
+  field_image:
+    -
+      plugin: sub_process
+      source: field_image
+      process:
+        target_id: fid
+        alt: alt
+        title: title
+        width: width
+        height: height
+  field_subhead_2:
+    -
+      plugin: get
+      source: field_subhead_2
+  field_subtitle:
+    -
+      plugin: get
+      source: field_subtitle
+  field_article_date:
+    -
+      plugin: sub_process
+      source: field_article_date
+      process:
+        value:
+          plugin: format_date
+          from_format: U
+          to_format: U
+          source: value
+  field_organization:
+    -
+      plugin: get
+      source: field_organization
+  field_contact_info:
+    -
+      plugin: get
+      source: field_contact_info
+  field_topics:
+    -
+      plugin: sub_process
+      source: field_topics
+      process:
+        target_id: tid
+destination:
+  plugin: 'entity_revision:node'
+  default_bundle: newswire
+migration_dependencies:
+  required:
+    - upgrade_d7_node_breaking_news
+    - upgrade_d7_node_fundraising_appeals
+    - upgrade_d7_node_further
+    - upgrade_d7_node_headline
+    - upgrade_d7_node_newswire
+    - upgrade_d7_node_page
+    - upgrade_d7_node_special_coverage
+    - upgrade_d7_node_video_article
+    - upgrade_d7_node_views_article
+  optional: {  }

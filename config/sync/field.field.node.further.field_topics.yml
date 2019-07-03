@@ -1,0 +1,46 @@
+uuid: 2d2fb548-6808-4c5f-9038-4b5b514ba402
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_topics
+    - node.type.further
+id: node.further.field_topics
+field_name: field_topics
+entity_type: node
+bundle: further
+label: Tags
+description: 'Optional: Adding tags here (separated by comma) will make the "Related Content" block at the bottom of your published article surface "News" and "Views" articles. Using "Further" alone will restrict the Related Content results to Further articles. Hint: When you enter additional terms first add a comma after "Further" then begin to type your desired term and wait for any and all pre-existing tags to display. Only choose from pre-existing tags. '
+required: true
+translatable: false
+default_value:
+  -
+    tid: '1394'
+    vid: '4'
+    name: Further
+    description: ''
+    format: permissive_html
+    weight: '0'
+    alias: further
+    vocabulary_machine_name: topic
+    metatags:
+      und:
+        robots:
+          value:
+            noindex: noindex
+            index: 0
+            follow: 0
+            nofollow: 0
+            noarchive: 0
+            nosnippet: 0
+            noodp: 0
+            noydir: 0
+            noimageindex: 0
+            notranslate: 0
+    path:
+      pathauto: '1'
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings: {  }
+field_type: entity_reference

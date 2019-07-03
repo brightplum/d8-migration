@@ -1,0 +1,20 @@
+uuid: 0cdb799d-c4ba-4762-a8cd-57d8436368db
+langcode: und
+status: true
+dependencies:
+  module:
+    - node
+    - text
+id: node.field_email_teaser
+field_name: field_email_teaser
+entity_type: node
+type: text
+settings:
+  max_length: 550
+module: text
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

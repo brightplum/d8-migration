@@ -1,0 +1,20 @@
+uuid: 74ff7cb9-fe44-4a4f-a391-8f7fd6b4afcd
+langcode: en
+status: true
+dependencies:
+  module:
+    - comment
+    - node
+id: node.comment_node_special_coverage
+field_name: comment_node_special_coverage
+entity_type: node
+type: comment
+settings:
+  comment_type: comment_node_special_coverage
+module: comment
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

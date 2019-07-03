@@ -1,0 +1,27 @@
+uuid: a05ed0c9-49fa-4eca-8910-4e00296cb8cc
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.related
+    - field.field.node.fundraising_appeals.body
+    - field.field.node.fundraising_appeals.field_article_date
+    - field.field.node.fundraising_appeals.field_social_message
+    - node.type.fundraising_appeals
+  module:
+    - user
+id: node.fundraising_appeals.related
+targetEntityType: node
+bundle: fundraising_appeals
+mode: related
+content:
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  body: true
+  field_article_date: true
+  field_social_message: true
+  langcode: true

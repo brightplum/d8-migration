@@ -1,0 +1,23 @@
+uuid: c1b6dec7-b689-412f-81ff-1d9f55f64633
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_more_text
+    - node.type.further
+  module:
+    - options
+id: node.further.field_more_text
+field_name: field_more_text
+entity_type: node
+bundle: further
+label: 'Which link will be on the homepage?'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: more
+default_value_callback: ''
+settings: {  }
+field_type: list_string

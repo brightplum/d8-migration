@@ -1,0 +1,41 @@
+uuid: c553ee94-9b3e-4dad-b76b-4bc8ce48f25f
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_display.comment.comment_node_breaking_news.default
+    - field.field.node.breaking_news.body
+    - field.field.node.breaking_news.comment_node_breaking_news
+    - node.type.breaking_news
+  module:
+    - comment
+    - text
+    - user
+id: node.breaking_news.default
+targetEntityType: node
+bundle: breaking_news
+mode: default
+content:
+  body:
+    label: hidden
+    weight: 0
+    type: text_default
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  comment_node_breaking_news:
+    label: hidden
+    type: comment_default
+    weight: 20
+    settings:
+      view_mode: default
+      pager_id: 0
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  langcode: true

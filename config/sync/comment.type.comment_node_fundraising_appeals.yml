@@ -1,0 +1,8 @@
+uuid: 54b2dca7-66fa-4fec-8de5-77c98690873b
+langcode: en
+status: true
+dependencies: {  }
+id: comment_node_fundraising_appeals
+label: 'Fundraising Appeals comment'
+target_entity_type_id: node
+description: null

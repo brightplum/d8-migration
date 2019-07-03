@@ -1,0 +1,66 @@
+uuid: 65474cf6-a633-457b-9959-0c9b812a6426
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.search_index
+    - field.field.node.newswire.body
+    - field.field.node.newswire.field_article_date
+    - field.field.node.newswire.field_contact_info
+    - field.field.node.newswire.field_desc
+    - field.field.node.newswire.field_hp_title
+    - field.field.node.newswire.field_image
+    - field.field.node.newswire.field_location
+    - field.field.node.newswire.field_menu_categories
+    - field.field.node.newswire.field_src_url
+    - field.field.node.newswire.field_subhead_2
+    - field.field.node.newswire.field_topics
+    - node.type.newswire
+  module:
+    - datetime
+    - user
+id: node.newswire.search_index
+targetEntityType: node
+bundle: newswire
+mode: search_index
+content:
+  field_article_date:
+    label: hidden
+    weight: 3
+    type: datetime_default
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    region: content
+  field_menu_categories:
+    label: hidden
+    weight: 11
+    type: entity_reference_label
+    settings:
+      link: true
+    third_party_settings: {  }
+    region: content
+  field_topics:
+    label: hidden
+    weight: 10
+    type: entity_reference_label
+    settings:
+      link: true
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  body: true
+  field_contact_info: true
+  field_desc: true
+  field_hp_title: true
+  field_image: true
+  field_location: true
+  field_src_url: true
+  field_subhead_2: true
+  langcode: true

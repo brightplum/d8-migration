@@ -1,0 +1,41 @@
+uuid: d2fe7803-e0e9-40c3-889c-a4c48db6ade1
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_display.comment.comment_node_special_coverage.default
+    - field.field.node.special_coverage.body
+    - field.field.node.special_coverage.comment_node_special_coverage
+    - node.type.special_coverage
+  module:
+    - comment
+    - text
+    - user
+id: node.special_coverage.default
+targetEntityType: node
+bundle: special_coverage
+mode: default
+content:
+  body:
+    label: hidden
+    weight: 7
+    type: text_default
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  comment_node_special_coverage:
+    label: hidden
+    type: comment_default
+    weight: 20
+    settings:
+      view_mode: default
+      pager_id: 0
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  langcode: true

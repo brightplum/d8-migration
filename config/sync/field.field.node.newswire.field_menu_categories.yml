@@ -1,0 +1,21 @@
+uuid: 88ab7dd4-fb33-43f8-bef8-9724027e9db4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_menu_categories
+    - node.type.newswire
+id: node.newswire.field_menu_categories
+field_name: field_menu_categories
+entity_type: node
+bundle: newswire
+label: 'Menu Categories'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings: {  }
+field_type: entity_reference

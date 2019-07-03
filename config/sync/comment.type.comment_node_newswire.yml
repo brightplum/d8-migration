@@ -1,0 +1,8 @@
+uuid: d59b6256-6d14-4902-aa91-d618a20cd632
+langcode: en
+status: true
+dependencies: {  }
+id: comment_node_newswire
+label: 'Newswire article comment'
+target_entity_type_id: node
+description: null

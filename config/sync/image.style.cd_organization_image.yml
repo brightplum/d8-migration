@@ -1,0 +1,15 @@
+uuid: b905d510-fe5d-45a8-8f7f-0a79f8b719e8
+langcode: en
+status: true
+dependencies: {  }
+name: cd_organization_image
+label: 'CD Organization Image'
+effects:
+  8cbfd8f9-2c84-4952-8f9a-13b11cf56c92:
+    uuid: 8cbfd8f9-2c84-4952-8f9a-13b11cf56c92
+    id: image_scale
+    weight: 1
+    data:
+      width: 600
+      height: null
+      upscale: false

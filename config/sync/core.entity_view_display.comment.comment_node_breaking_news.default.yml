@@ -1,0 +1,28 @@
+uuid: 7ed542fa-1b8d-42f2-a4cc-aad480bd2ede
+langcode: en
+status: true
+dependencies:
+  config:
+    - comment.type.comment_node_breaking_news
+    - field.field.comment.comment_node_breaking_news.comment_body
+  module:
+    - text
+id: comment.comment_node_breaking_news.default
+targetEntityType: comment
+bundle: comment_node_breaking_news
+mode: default
+content:
+  comment_body:
+    label: hidden
+    type: text_default
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  langcode: true

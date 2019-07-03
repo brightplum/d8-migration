@@ -1,0 +1,21 @@
+uuid: 481e4d34-8857-4b9c-93b4-28769d88c1ed
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.file.preview
+    - field.field.file.image.field_file_image_alt_text
+    - field.field.file.image.field_file_image_css_class
+    - field.field.file.image.field_file_image_title_text
+  module:
+    - file
+id: file.image.preview
+targetEntityType: file
+bundle: image
+mode: preview
+content: {  }
+hidden:
+  field_file_image_alt_text: true
+  field_file_image_css_class: true
+  field_file_image_title_text: true
+  langcode: true

@@ -1,0 +1,14 @@
+uuid: 6be453ee-a115-4b63-a7ca-70a33dff635c
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.cd_admin
+  module:
+    - user
+id: user_add_role_action.cd_admin
+label: 'Add the cd admin role to the selected user(s)'
+type: user
+plugin: user_add_role_action
+configuration:
+  rid: cd_admin

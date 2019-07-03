@@ -1,0 +1,23 @@
+uuid: e358d619-e553-4a4c-8795-fd76b41da14f
+langcode: en
+status: true
+dependencies: {  }
+name: cd_large
+label: 'CD Large (955x500)'
+effects:
+  0ce9342d-ac28-4ac0-9151-d230ce8b9fff:
+    uuid: 0ce9342d-ac28-4ac0-9151-d230ce8b9fff
+    id: image_scale
+    weight: 0
+    data:
+      width: 955
+      height: null
+      upscale: true
+  ab5359cb-7272-419c-a876-bb3969f88d44:
+    uuid: ab5359cb-7272-419c-a876-bb3969f88d44
+    id: image_crop
+    weight: 1
+    data:
+      width: 955
+      height: 500
+      anchor: center-center

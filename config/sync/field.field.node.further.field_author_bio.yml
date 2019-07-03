@@ -1,0 +1,22 @@
+uuid: c388a160-bc42-498e-87db-e21ee7e7204e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_author_bio
+    - node.type.further
+  module:
+    - text
+id: node.further.field_author_bio
+field_name: field_author_bio
+entity_type: node
+bundle: further
+label: 'Author Info'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: false
+field_type: text_with_summary

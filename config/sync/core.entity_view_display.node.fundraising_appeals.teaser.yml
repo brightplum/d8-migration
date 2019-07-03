@@ -1,0 +1,35 @@
+uuid: d0c50c38-dec7-4981-9030-8f1f81276fd2
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.fundraising_appeals.body
+    - field.field.node.fundraising_appeals.field_article_date
+    - field.field.node.fundraising_appeals.field_social_message
+    - node.type.fundraising_appeals
+  module:
+    - text
+    - user
+id: node.fundraising_appeals.teaser
+targetEntityType: node
+bundle: fundraising_appeals
+mode: teaser
+content:
+  body:
+    label: hidden
+    weight: 0
+    type: text_summary_or_trimmed
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  field_article_date: true
+  field_social_message: true
+  langcode: true

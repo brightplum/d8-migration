@@ -1,0 +1,19 @@
+uuid: a45d8a49-3916-498e-b232-df7cf227ad90
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_hp_title
+    - node.type.headline
+id: node.headline.field_hp_title
+field_name: field_hp_title
+entity_type: node
+bundle: headline
+label: 'Home page title'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

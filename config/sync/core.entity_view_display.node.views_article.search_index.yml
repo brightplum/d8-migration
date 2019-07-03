@@ -1,0 +1,110 @@
+uuid: 995524e6-b35c-439e-95e3-e0313359d4b4
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.search_index
+    - field.field.node.views_article.body
+    - field.field.node.views_article.field_article_date
+    - field.field.node.views_article.field_article_img
+    - field.field.node.views_article.field_author_bio
+    - field.field.node.views_article.field_author_name
+    - field.field.node.views_article.field_email_teaser
+    - field.field.node.views_article.field_hp_author
+    - field.field.node.views_article.field_hp_title
+    - field.field.node.views_article.field_image
+    - field.field.node.views_article.field_main_caption
+    - field.field.node.views_article.field_menu_categories
+    - field.field.node.views_article.field_social_media_image
+    - field.field.node.views_article.field_src_url
+    - field.field.node.views_article.field_topics
+    - node.type.views_article
+  module:
+    - datetime
+    - link
+    - text
+    - user
+id: node.views_article.search_index
+targetEntityType: node
+bundle: views_article
+mode: search_index
+content:
+  body:
+    label: hidden
+    weight: 9
+    type: text_default
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_article_date:
+    label: hidden
+    weight: 1
+    type: datetime_default
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    region: content
+  field_author_bio:
+    label: hidden
+    weight: 11
+    type: text_default
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_author_name:
+    label: hidden
+    weight: 6
+    type: string
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    region: content
+  field_main_caption:
+    label: hidden
+    weight: 8
+    type: text_default
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_menu_categories:
+    label: hidden
+    weight: 14
+    type: entity_reference_label
+    settings:
+      link: true
+    third_party_settings: {  }
+    region: content
+  field_src_url:
+    label: hidden
+    weight: 2
+    type: link
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    region: content
+  field_topics:
+    label: hidden
+    weight: 16
+    type: entity_reference_label
+    settings:
+      link: true
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  field_article_img: true
+  field_email_teaser: true
+  field_hp_author: true
+  field_hp_title: true
+  field_image: true
+  field_social_media_image: true
+  langcode: true

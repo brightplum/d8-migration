@@ -1,0 +1,21 @@
+uuid: faab281e-1cd7-4204-bf8e-93059eb6c6cc
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_main_caption
+    - node.type.views_article
+  module:
+    - text
+id: node.views_article.field_main_caption
+field_name: field_main_caption
+entity_type: node
+bundle: views_article
+label: 'Article Image Caption'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text_long

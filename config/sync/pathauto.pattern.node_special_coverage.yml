@@ -1,0 +1,21 @@
+uuid: e06e2a98-3c09-44c5-8ea3-6127a956ce90
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node_special_coverage
+label: 'Content - Special Coverage'
+type: 'canonical_entities:node'
+pattern: 'special/[node:title]'
+selection_criteria:
+  -
+    id: node_type
+    bundles:
+      special_coverage: special_coverage
+    negate: false
+    context_mapping:
+      node: node
+selection_logic: and
+weight: 0
+relationships: {  }

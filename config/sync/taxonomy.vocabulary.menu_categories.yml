@@ -1,0 +1,8 @@
+uuid: 42f3221c-fbb8-46b9-8205-5a3caf21cecf
+langcode: en
+status: true
+dependencies: {  }
+name: 'Menu Categories'
+vid: menu_categories
+description: 'Categories which drive the main menu and organize the content.'
+weight: 0

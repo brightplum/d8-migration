@@ -1,0 +1,23 @@
+uuid: 6e37c3a4-3e2c-4d9b-9bcd-aa07d6bb77d4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_src_url
+    - node.type.further
+  module:
+    - link
+id: node.further.field_src_url
+field_name: field_src_url
+entity_type: node
+bundle: further
+label: Source
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 17
+field_type: link

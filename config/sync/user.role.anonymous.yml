@@ -1,0 +1,17 @@
+uuid: dd8a5d90-9fa5-40d1-8ab9-223f7545add1
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: j5zLMOdJBqC0bMvSdth5UebkprJB8g_2FXHqhfpJzow
+id: anonymous
+label: 'anonymous user'
+weight: 0
+is_admin: false
+permissions:
+  - 'access content'
+  - 'access pwa'
+  - 'search content'
+  - 'use text format filtered_html'
+  - 'view disqus comments'
+  - 'view files'

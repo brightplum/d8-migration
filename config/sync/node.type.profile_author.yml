@@ -1,0 +1,17 @@
+uuid: 4b1f8d59-862b-45ff-835c-f60f0be593da
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus: {  }
+    parent: ''
+name: 'Profile Author'
+type: profile_author
+description: ''
+help: ''
+new_revision: false
+preview_mode: 1
+display_submitted: true

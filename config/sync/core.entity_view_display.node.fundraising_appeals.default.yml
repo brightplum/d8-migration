@@ -1,0 +1,54 @@
+uuid: 08151197-cd72-44c7-9448-64ca312b61dc
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_display.comment.comment_node_fundraising_appeals.default
+    - field.field.node.fundraising_appeals.body
+    - field.field.node.fundraising_appeals.comment_node_fundraising_appeals
+    - field.field.node.fundraising_appeals.field_article_date
+    - field.field.node.fundraising_appeals.field_social_message
+    - node.type.fundraising_appeals
+  module:
+    - comment
+    - datetime
+    - text
+    - user
+id: node.fundraising_appeals.default
+targetEntityType: node
+bundle: fundraising_appeals
+mode: default
+content:
+  body:
+    label: hidden
+    weight: 4
+    type: text_default
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  comment_node_fundraising_appeals:
+    label: hidden
+    type: comment_default
+    weight: 20
+    settings:
+      view_mode: default
+      pager_id: 0
+    third_party_settings: {  }
+    region: content
+  field_article_date:
+    label: hidden
+    weight: 1
+    type: datetime_default
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  field_social_message: true
+  langcode: true

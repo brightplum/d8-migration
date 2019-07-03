@@ -1,0 +1,21 @@
+uuid: 58eaa3ec-5421-4d7a-84c6-909a1859e188
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_topics
+    - node.type.video_article
+id: node.video_article.field_topics
+field_name: field_topics
+entity_type: node
+bundle: video_article
+label: Tags
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings: {  }
+field_type: entity_reference

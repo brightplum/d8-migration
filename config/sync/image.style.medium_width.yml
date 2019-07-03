@@ -1,0 +1,15 @@
+uuid: b8fc3cef-7514-49ab-b34c-16d1a5b030b3
+langcode: en
+status: true
+dependencies: {  }
+name: medium_width
+label: 'Content medium width'
+effects:
+  aac08fe1-0ab3-45a0-b06a-92d006b66f35:
+    uuid: aac08fe1-0ab3-45a0-b06a-92d006b66f35
+    id: image_scale
+    weight: 1
+    data:
+      width: 300
+      height: null
+      upscale: true

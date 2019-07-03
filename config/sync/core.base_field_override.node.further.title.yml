@@ -1,0 +1,18 @@
+uuid: 45a681c3-9ed7-4a4f-b9f7-158bbc7ef2e8
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.further
+id: node.further.title
+field_name: title
+entity_type: node
+bundle: further
+label: Title
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,21 @@
+uuid: a43d27e2-7c2e-49e5-a241-2a9163ee5992
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.file.field_file_image_css_class
+  module:
+    - file
+    - options
+id: file.image.field_file_image_css_class
+field_name: field_file_image_css_class
+entity_type: file
+bundle: image
+label: 'CSS Class'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

@@ -1,0 +1,15 @@
+uuid: c9b620c6-2ef0-4d6d-afc4-4fdde6bbbc62
+langcode: en
+status: true
+dependencies: {  }
+name: small_width
+label: 'Content small width'
+effects:
+  70c004ee-ac8b-4b33-a37c-209d3fc973b0:
+    uuid: 70c004ee-ac8b-4b33-a37c-209d3fc973b0
+    id: image_scale
+    weight: 1
+    data:
+      width: 200
+      height: null
+      upscale: true
